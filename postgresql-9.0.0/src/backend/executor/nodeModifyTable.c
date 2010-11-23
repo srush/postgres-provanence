@@ -178,25 +178,25 @@ ExecInsert(TupleTableSlot *slot,
                    errmsg("VIRTUAL TUPLE")));
           
           if (slot->tts_provinfo == NULL) {
+            /*ereport(ERROR,
+                    (errcode(ERRCODE_CONFIG_FILE_ERROR),
+                    errmsg("PROV INFO NULL")));*/
+          } else {
+
             ereport(DEBUG5,
                     (errcode(ERRCODE_CONFIG_FILE_ERROR),
-                     errmsg("PROV INFO NULL")));
+                     errmsg("VIRTUAL TUPLE Came from %d"),
+                     ((ProvInfo*)linitial((slot->tts_provinfo)))->table_id
+                     ));
           }
 
-          ereport(DEBUG5,
-                  (errcode(ERRCODE_CONFIG_FILE_ERROR),
-                   errmsg("VIRTUAL TUPLE Came from %d"),
-                   ((ProvInfo*)linitial((slot->tts_provinfo)))->table_id
-                   ));
-          
-
         } else {
-
+          /*
           ereport(ERROR,
                   (errcode(ERRCODE_CONFIG_FILE_ERROR),
                    errmsg("Original Table is %d"),           
                    slot->tts_tuple->t_tableOid));
-          
+          */
         }
 
 	tuple = ExecMaterializeSlot(slot);

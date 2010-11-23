@@ -366,6 +366,14 @@ ExecStoreTuple(HeapTuple tuple,
         provinfo->primary_key = 0;
         slot->tts_provinfo = list_make1(provinfo);
         
+        if (slot->tts_provinfo == NULL) {
+          ereport(ERROR,
+                  (errcode(ERRCODE_CONFIG_FILE_ERROR),
+                   errmsg("PROVINFO NULL Store ")
+                   ));
+
+        }
+
         ereport(DEBUG5,
                 (errcode(ERRCODE_CONFIG_FILE_ERROR),
                  errmsg("Start VIRTUAL TUPLE Came from %d"),

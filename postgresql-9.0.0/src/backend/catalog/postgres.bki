@@ -4369,6 +4369,12 @@ create pg_statistic 2619 without_oids
  )
 open pg_statistic
 close pg_statistic
+create pg_prov 87563 without_oids
+ (
+ tableid = oid
+ )
+open pg_prov
+close pg_prov
 create pg_rewrite 2618
  (
  rulename = name ,

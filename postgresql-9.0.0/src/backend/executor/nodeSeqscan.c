@@ -66,13 +66,13 @@ SeqNext(SeqScanState *node)
 	tuple = heap_getnext(scandesc, direction);
 
         /* DEBUG */
-        ereport(ERROR,
+        ereport(DEBUG5,
                 (errcode(ERRCODE_CONFIG_FILE_ERROR),
                  errmsg("SCAN TUPLE")));
    
         
-        ereport(ERROR,
-                (errmsg_internal("scan"), errdetail("scan2")));
+        //ereport(ERROR,
+        //      (errmsg_internal("scan"), errdetail("scan2")));
         //ereport(1, (errmsg_internal("tuple scanned")));
         //ereport(1, (errmsg_internal("tuple scanned")));
 

@@ -494,6 +494,15 @@ ExecProcNode(PlanState *node)
                   (errcode(ERRCODE_CONFIG_FILE_ERROR),
                    errmsg("Node tag %d"),           
                    nodeTag(node)));
+
+          if (result->tts_provinfo == NULL) {
+            ereport(DEBUG5,
+                    (errcode(ERRCODE_CONFIG_FILE_ERROR),
+                     errmsg("PROVINFO NULL ProcNode ")
+                     ));
+
+          }
+
     
           if (result->tts_tuple== NULL) {
             elog(DEBUG5, "Virtual Tuple  ");

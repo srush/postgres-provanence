@@ -87,7 +87,15 @@ IndexNext(IndexScanState *node)
 					   scandesc->xs_cbuf,		/* buffer containing tuple */
 					   false);	/* don't pfree */
 
-		/*
+                if (slot->tts_provinfo == NULL) {
+                  ereport(ERROR,
+                    (errcode(ERRCODE_CONFIG_FILE_ERROR),
+                     errmsg("PROVINFO NULL IndexScan ")
+                     ));
+                  
+                }
+
+                /*
 		 * If the index was lossy, we have to recheck the index quals using
 		 * the real tuple.
 		 */

@@ -162,6 +162,16 @@ ExecScan(ScanState *node,
 		CHECK_FOR_INTERRUPTS();
 
 		slot = ExecScanFetch(node, accessMtd, recheckMtd);
+                
+                if (slot->tts_provinfo == NULL) {
+                  ereport(DEBUG5,
+                          (errcode(ERRCODE_CONFIG_FILE_ERROR),
+                           errmsg("PROVINFO NULL after ScanFetch ")
+                           ));
+
+                }
+
+
 
 		/*
 		 * if the slot returned by the accessMtd contains NULL, then it means
@@ -202,7 +212,18 @@ ExecScan(ScanState *node,
 				 * from this scan tuple, in which case continue scan.
 				 */
 				resultSlot = ExecProject(projInfo, &isDone);
-				if (isDone != ExprEndResult)
+				
+                                resultSlot->tts_provinfo = list_copy(slot->tts_provinfo);
+                                
+                                if (resultSlot->tts_provinfo == NULL) {
+                                  ereport(DEBUG5,
+                                          (errcode(ERRCODE_CONFIG_FILE_ERROR),
+                                           errmsg("PROVINFO NULL Project kills is  ")
+                                           ));
+                                  
+                                }
+
+                                if (isDone != ExprEndResult)
 				{
 					node->ps.ps_TupFromTlist = (isDone == ExprMultipleResult);
 					return resultSlot;
