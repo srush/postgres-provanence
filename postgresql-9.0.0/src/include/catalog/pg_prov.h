@@ -8,7 +8,7 @@
  *		typedef struct FormData_pg_statistic
  * ----------------
  */
-#define StatisticRelationId  87563
+#define ProvRelationId  87563
 
 CATALOG(pg_prov,87563) BKI_WITHOUT_OIDS
 {

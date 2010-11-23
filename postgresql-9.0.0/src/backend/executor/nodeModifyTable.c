@@ -47,7 +47,7 @@
 #include "utils/builtins.h"
 #include "utils/memutils.h"
 #include "utils/tqual.h"
-
+#include "catalog/pg_prov.h"
 
 /*
  * Verify that the tuples to be produced by INSERT or UPDATE match the
@@ -148,6 +148,29 @@ ExecProcessReturning(ProjectionInfo *projectReturning,
 	return ExecProject(projectReturning, NULL);
 }
 
+
+static void
+insert_prov(Oid tableid)
+{
+	Relation	sd;
+	sd = heap_open(ProvRelationId, RowExclusiveLock);
+
+        HeapTuple	stup;
+          
+        Datum		values[Natts_pg_prov];
+        bool		nulls[Natts_pg_prov];
+
+        values[0] = ObjectIdGetDatum(tableid);
+        nulls[0]  = false;
+        
+        stup = heap_form_tuple(RelationGetDescr(sd), values, nulls);
+        simple_heap_insert(sd, stup);
+
+        heap_freetuple(stup);
+	heap_close(sd, RowExclusiveLock);
+}
+
+
 /* ----------------------------------------------------------------
  *		ExecInsert
  *
@@ -182,7 +205,8 @@ ExecInsert(TupleTableSlot *slot,
                     (errcode(ERRCODE_CONFIG_FILE_ERROR),
                     errmsg("PROV INFO NULL")));*/
           } else {
-
+            insert_prov(((ProvInfo*)linitial((slot->tts_provinfo)))->table_id);
+            
             ereport(DEBUG5,
                     (errcode(ERRCODE_CONFIG_FILE_ERROR),
                      errmsg("VIRTUAL TUPLE Came from %d"),
