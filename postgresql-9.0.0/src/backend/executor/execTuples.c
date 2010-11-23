@@ -128,7 +128,8 @@ MakeTupleTableSlot(void)
 	slot->tts_values = NULL;
 	slot->tts_isnull = NULL;
 	slot->tts_mintuple = NULL;
-
+        //ADDING NS
+        slot->tts_provinfo = NULL;
 	return slot;
 }
 
@@ -358,6 +359,19 @@ ExecStoreTuple(HeapTuple tuple,
 
 	/* Mark extracted state invalid */
 	slot->tts_nvalid = 0;
+        
+        // ADDING NS
+        ProvInfo * provinfo = makeNode(ProvInfo); //provinfo(tuple.t_tableOid, tuple.t_primary_key);
+        provinfo->table_id = tuple->t_tableOid;
+        provinfo->primary_key = 0;
+        slot->tts_provinfo = list_make1(provinfo);
+        
+        ereport(DEBUG5,
+                (errcode(ERRCODE_CONFIG_FILE_ERROR),
+                 errmsg("Start VIRTUAL TUPLE Came from %d"),
+                 ((ProvInfo*)linitial((slot->tts_provinfo)))->table_id
+                 ));
+
 
 	/*
 	 * If tuple is on a disk page, keep the page pinned as long as we hold a

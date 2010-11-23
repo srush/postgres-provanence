@@ -376,16 +376,25 @@ ExecProcNode(PlanState *node)
 			 */
 		case T_SeqScanState:
 			result = ExecSeqScan((SeqScanState *) node);
+                        ereport(DEBUG5,
+                                (errcode(ERRCODE_CONFIG_FILE_ERROR),
+                                 errmsg("Seq scan")));
+
 			break;
 
-		case T_IndexScanState:
+                case T_IndexScanState:
 			result = ExecIndexScan((IndexScanState *) node);
+                        ereport(DEBUG5,
+                                (errcode(ERRCODE_CONFIG_FILE_ERROR),
+                                 errmsg("Index scan")));
+
 			break;
 
 			/* BitmapIndexScanState does not yield tuples */
 
 		case T_BitmapHeapScanState:
 			result = ExecBitmapHeapScan((BitmapHeapScanState *) node);
+
 			break;
 
 		case T_TidScanState:
@@ -475,6 +484,26 @@ ExecProcNode(PlanState *node)
 			result = NULL;
 			break;
 	}
+
+        switch (nodeTag(node)) {
+        case T_SeqScanState:
+        case T_IndexScanState:
+        case T_BitmapHeapScanState:
+        case T_TidScanState:
+          ereport(DEBUG5,
+                  (errcode(ERRCODE_CONFIG_FILE_ERROR),
+                   errmsg("Node tag %d"),           
+                   nodeTag(node)));
+    
+          if (result->tts_tuple== NULL) {
+            elog(DEBUG5, "Virtual Tuple  ");
+          } else {
+            ereport(DEBUG5,
+                    (errcode(ERRCODE_CONFIG_FILE_ERROR),
+                     errmsg("Real Tuple : Original Table is %d"),           
+                     result->tts_tuple->t_tableOid));
+          }
+        }
 
 	if (node->instrument)
 		InstrStopNode(node->instrument, TupIsNull(result) ? 0.0 : 1.0);

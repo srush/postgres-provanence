@@ -99,6 +99,15 @@ IndexNext(IndexScanState *node)
 				continue;		/* nope, so ask index for another one */
 		}
 
+                if (slot->tts_tuple != NULL) {
+                  
+                  ereport(DEBUG5,
+                          (errcode(ERRCODE_CONFIG_FILE_ERROR),
+                           errmsg("Real Tuple")));
+
+                }
+
+
 		return slot;
 	}
 

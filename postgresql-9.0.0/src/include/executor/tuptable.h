@@ -127,7 +127,18 @@ typedef struct TupleTableSlot
 	MinimalTuple tts_mintuple;	/* minimal tuple, or NULL if none */
 	HeapTupleData tts_minhdr;	/* workspace for minimal-tuple-only case */
 	long		tts_off;		/* saved state for slot_deform_tuple */
+
+  //ADDING
+  List * tts_provinfo;
+
 } TupleTableSlot;
+
+
+typedef struct ProvInfo {
+  NodeTag		type;
+  Oid table_id;
+  int primary_key;
+} ProvInfo;
 
 #define TTS_HAS_PHYSICAL_TUPLE(slot)  \
 	((slot)->tts_tuple != NULL && (slot)->tts_tuple != &((slot)->tts_minhdr))

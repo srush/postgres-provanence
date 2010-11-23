@@ -65,6 +65,17 @@ SeqNext(SeqScanState *node)
 	 */
 	tuple = heap_getnext(scandesc, direction);
 
+        /* DEBUG */
+        ereport(ERROR,
+                (errcode(ERRCODE_CONFIG_FILE_ERROR),
+                 errmsg("SCAN TUPLE")));
+   
+        
+        ereport(ERROR,
+                (errmsg_internal("scan"), errdetail("scan2")));
+        //ereport(1, (errmsg_internal("tuple scanned")));
+        //ereport(1, (errmsg_internal("tuple scanned")));
+
 	/*
 	 * save the tuple and the buffer returned to us by the access methods in
 	 * our scan tuple slot and return the slot.  Note: we pass 'false' because

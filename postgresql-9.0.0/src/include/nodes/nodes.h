@@ -397,7 +397,9 @@ typedef enum NodeTag
 	T_ReturnSetInfo,			/* in nodes/execnodes.h */
 	T_WindowObjectData,			/* private in nodeWindowAgg.c */
 	T_TIDBitmap,				/* in nodes/tidbitmap.h */
-	T_InlineCodeBlock			/* in nodes/parsenodes.h */
+	T_InlineCodeBlock,			/* in nodes/parsenodes.h */
+
+	T_ProvInfo			/* ProvInfo */
 } NodeTag;
 
 /*
@@ -455,6 +457,7 @@ extern PGDLLIMPORT Node *newNodeMacroHolder;
 
 
 #define makeNode(_type_)		((_type_ *) newNode(sizeof(_type_),T_##_type_))
+
 #define NodeSetTag(nodeptr,t)	(((Node*)(nodeptr))->type = (t))
 
 #define IsA(nodeptr,_type_)		(nodeTag(nodeptr) == T_##_type_)
