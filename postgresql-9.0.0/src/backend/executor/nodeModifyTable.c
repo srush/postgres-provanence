@@ -195,24 +195,26 @@ ExecInsert(TupleTableSlot *slot,
 	 * get the heap tuple out of the tuple table slot, making sure we have a
 	 * writable copy
 	 */
+
+        if (slot->tts_provinfo == NULL) {
+          ereport(DEBUG5,
+                  (errcode(ERRCODE_CONFIG_FILE_ERROR),
+                   errmsg("PROV INFO NULL")));
+        } else {
+          insert_prov(((ProvInfo*)linitial((slot->tts_provinfo)))->table_id);
+          
+          ereport(DEBUG5,
+                  (errcode(ERRCODE_CONFIG_FILE_ERROR),
+                   errmsg("VIRTUAL TUPLE Came from %d"),
+                   ((ProvInfo*)linitial((slot->tts_provinfo)))->table_id
+                   ));
+        }
+
         if (slot->tts_tuple == NULL) {
           ereport(DEBUG5,
                   (errcode(ERRCODE_CONFIG_FILE_ERROR),
                    errmsg("VIRTUAL TUPLE")));
           
-          if (slot->tts_provinfo == NULL) {
-            /*ereport(ERROR,
-                    (errcode(ERRCODE_CONFIG_FILE_ERROR),
-                    errmsg("PROV INFO NULL")));*/
-          } else {
-            insert_prov(((ProvInfo*)linitial((slot->tts_provinfo)))->table_id);
-            
-            ereport(DEBUG5,
-                    (errcode(ERRCODE_CONFIG_FILE_ERROR),
-                     errmsg("VIRTUAL TUPLE Came from %d"),
-                     ((ProvInfo*)linitial((slot->tts_provinfo)))->table_id
-                     ));
-          }
 
         } else {
           /*
