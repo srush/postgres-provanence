@@ -193,7 +193,7 @@ ExecInsert(TupleTableSlot *slot,
 	Relation	resultRelationDesc;
 	Oid			newId;
 	List	   *recheckIndexes = NIL;
-
+        ListCell * l;
 	/*
 	 * get the heap tuple out of the tuple table slot, making sure we have a
 	 * writable copy
@@ -292,13 +292,22 @@ ExecInsert(TupleTableSlot *slot,
         } else {
           ereport(DEBUG5,
                   (errcode(ERRCODE_CONFIG_FILE_ERROR),
-                   errmsg("Pre insert VIRTUAL TUPLE Came from %d"),
-                   ((ProvInfo*)linitial((slot->tts_provinfo)))->table_id
-                   ));
+                   errmsg("Num ProvInfo %d",
+                   list_length(slot->tts_provinfo)
+                          )));
 
-          insert_prov(((ProvInfo*)linitial((slot->tts_provinfo)))->table_id,
-                      tuple->t_tableOid);
-          
+          foreach(l, slot->tts_provinfo) {
+            ProvInfo * prev = (ProvInfo *) lfirst(l);
+
+            ereport(DEBUG5,
+                    (errcode(ERRCODE_CONFIG_FILE_ERROR),
+                     errmsg("Pre insert VIRTUAL TUPLE Came from %d",
+                     prev->table_id
+                            )));
+
+            insert_prov(prev->table_id,
+                        tuple->t_tableOid);
+          }
         }
 
         if (slot->tts_tuple == NULL) {

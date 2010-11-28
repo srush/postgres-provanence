@@ -376,9 +376,9 @@ ExecStoreTuple(HeapTuple tuple,
 
         ereport(DEBUG5,
                 (errcode(ERRCODE_CONFIG_FILE_ERROR),
-                 errmsg("Start VIRTUAL TUPLE Came from %d"),
+                 errmsg("Start VIRTUAL TUPLE Came from %d",
                  ((ProvInfo*)linitial((slot->tts_provinfo)))->table_id
-                 ));
+                        )));
 
 
 	/*

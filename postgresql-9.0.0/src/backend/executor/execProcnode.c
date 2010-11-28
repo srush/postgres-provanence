@@ -429,11 +429,20 @@ ExecProcNode(PlanState *node)
 			break;
 
 		case T_MergeJoinState:
+                  ereport(DEBUG5,
+                          (errcode(ERRCODE_CONFIG_FILE_ERROR),
+                                 errmsg("MergeJoinState")));
+
 			result = ExecMergeJoin((MergeJoinState *) node);
 			break;
 
 		case T_HashJoinState:
+                  ereport(DEBUG5,
+                          (errcode(ERRCODE_CONFIG_FILE_ERROR),
+                                 errmsg("HashJoinState")));
+
 			result = ExecHashJoin((HashJoinState *) node);
+
 			break;
 
 			/*
@@ -509,8 +518,8 @@ ExecProcNode(PlanState *node)
           } else {
             ereport(DEBUG5,
                     (errcode(ERRCODE_CONFIG_FILE_ERROR),
-                     errmsg("Real Tuple : Original Table is %d"),           
-                     result->tts_tuple->t_tableOid));
+                     errmsg("Real Tuple : Original Table is %d",           
+                            result->tts_tuple->t_tableOid)));
           }
         }
 

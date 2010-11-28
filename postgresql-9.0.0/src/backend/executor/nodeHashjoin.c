@@ -86,7 +86,12 @@ ExecHashJoin(HashJoinState *node)
 		TupleTableSlot *result;
 
 		result = ExecProject(node->js.ps.ps_ProjInfo, &isDone);
-		if (isDone == ExprMultipleResult)
+		
+                ereport(DEBUG5,
+                        (errcode(ERRCODE_CONFIG_FILE_ERROR),
+                         errmsg("Make Result3")));
+                                                          
+                if (isDone == ExprMultipleResult)
 			return result;
 		/* Done with that source tuple... */
 		node->js.ps.ps_TupFromTlist = false;
@@ -279,10 +284,16 @@ ExecHashJoin(HashJoinState *node)
 				{
 					TupleTableSlot *result;
 
+                                        ereport(DEBUG5,
+                                                (errcode(ERRCODE_CONFIG_FILE_ERROR),
+                                                 errmsg("END PROJECT")));
+
 					result = ExecProject(node->js.ps.ps_ProjInfo, &isDone);
 
 					if (isDone != ExprEndResult)
 					{
+                                          
+
 						node->js.ps.ps_TupFromTlist =
 							(isDone == ExprMultipleResult);
 						return result;
@@ -324,6 +335,11 @@ ExecHashJoin(HashJoinState *node)
 				TupleTableSlot *result;
 
 				result = ExecProject(node->js.ps.ps_ProjInfo, &isDone);
+                                
+                                ereport(DEBUG5,
+                                        (errcode(ERRCODE_CONFIG_FILE_ERROR),
+                                         errmsg("Make Result")));
+
 
 				if (isDone != ExprEndResult)
 				{

@@ -5274,16 +5274,22 @@ ExecProject(ProjectionInfo *projInfo, ExprDoneCond *isDone)
 				char	   *slotptr = ((char *) econtext) + varSlotOffsets[i];
 				TupleTableSlot *varSlot = *((TupleTableSlot **) slotptr);
 				int			varNumber = varNumbers[i] - 1;
-                                
-
+                               
                                 
 				values[i] = varSlot->tts_values[varNumber];
 				isnull[i] = varSlot->tts_isnull[varNumber];
                                 
+                                ereport(DEBUG5,
+                                        (errcode(ERRCODE_CONFIG_FILE_ERROR),
+                                         errmsg("Project %d %d",
+                                                i, varSlotOffsets[i])));
+                                         
+
+                                
                                 // ADDING
                                 // don't add provinfo twice
-                                if (!list_member(origin_seen, varSlotOffsets[i])) {
-                                  origin_seen = lappend(origin_seen, varSlotOffsets[i]);
+                                if (!list_member_int(origin_seen, varSlotOffsets[i])) {
+                                  origin_seen = lappend_int(origin_seen, varSlotOffsets[i]);
                                   // copy provinfo                                
                                   if (varSlot->tts_provinfo != NULL) {
                                     slot->tts_provinfo = list_concat(slot->tts_provinfo, varSlot->tts_provinfo);
@@ -5305,10 +5311,17 @@ ExecProject(ProjectionInfo *projInfo, ExprDoneCond *isDone)
 
 				values[varOutputCol] = varSlot->tts_values[varNumber];
 				isnull[varOutputCol] = varSlot->tts_isnull[varNumber];
+                                
+                                
+                                ereport(DEBUG5,
+                                        (errcode(ERRCODE_DATATYPE_MISMATCH),
+                                         errmsg("Project %d %d %d",
+                                                i, varSlotOffsets[i], varOutputCol)));
 
+               
                                 // ADDING
-                                if (!list_member(origin_seen, varSlotOffsets[i])) {
-                                  origin_seen = lappend(origin_seen, varSlotOffsets[i]);
+                                if (!list_member_int(origin_seen, varSlotOffsets[i])) {
+                                  origin_seen = lappend_int(origin_seen, varSlotOffsets[i]);
                                   
                                   // copy provinfo
                                   if (varSlot->tts_provinfo != NULL) {
@@ -5327,6 +5340,12 @@ ExecProject(ProjectionInfo *projInfo, ExprDoneCond *isDone)
 	 */
 	if (projInfo->pi_targetlist)
 	{
+          ereport(DEBUG5,
+                  (errcode(ERRCODE_DATATYPE_MISMATCH),
+                   errmsg("extra")));
+                          
+
+
 		if (!ExecTargetList(projInfo->pi_targetlist,
 							econtext,
 							slot->tts_values,

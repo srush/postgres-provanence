@@ -218,7 +218,7 @@ ExecScan(ScanState *node,
                                 if (resultSlot->tts_provinfo == NULL) {
                                   ereport(DEBUG5,
                                           (errcode(ERRCODE_CONFIG_FILE_ERROR),
-                                           errmsg("PROVINFO NULL Project kills is  ")
+                                           errmsg("PROVINFO NULL kills is  ")
                                            ));
                                   
                                 }
