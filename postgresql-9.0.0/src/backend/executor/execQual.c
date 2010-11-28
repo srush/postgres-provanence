@@ -5261,6 +5261,10 @@ ExecProject(ProjectionInfo *projInfo, ExprDoneCond *isDone)
 		int		   *varSlotOffsets = projInfo->pi_varSlotOffsets;
 		int		   *varNumbers = projInfo->pi_varNumbers;
 		int			i;
+                
+                // ADDING
+                //slot->tts_provinfo = 
+                List       * origin_seen = NIL; 
 
 		if (projInfo->pi_directMap)
 		{
@@ -5270,9 +5274,21 @@ ExecProject(ProjectionInfo *projInfo, ExprDoneCond *isDone)
 				char	   *slotptr = ((char *) econtext) + varSlotOffsets[i];
 				TupleTableSlot *varSlot = *((TupleTableSlot **) slotptr);
 				int			varNumber = varNumbers[i] - 1;
+                                
 
+                                
 				values[i] = varSlot->tts_values[varNumber];
 				isnull[i] = varSlot->tts_isnull[varNumber];
+                                
+                                // ADDING
+                                // don't add provinfo twice
+                                if (!list_member(origin_seen, varSlotOffsets[i])) {
+                                  origin_seen = lappend(origin_seen, varSlotOffsets[i]);
+                                  // copy provinfo                                
+                                  if (varSlot->tts_provinfo != NULL) {
+                                    slot->tts_provinfo = list_concat(slot->tts_provinfo, varSlot->tts_provinfo);
+                                  }
+                                }
 			}
 		}
 		else
@@ -5289,6 +5305,16 @@ ExecProject(ProjectionInfo *projInfo, ExprDoneCond *isDone)
 
 				values[varOutputCol] = varSlot->tts_values[varNumber];
 				isnull[varOutputCol] = varSlot->tts_isnull[varNumber];
+
+                                // ADDING
+                                if (!list_member(origin_seen, varSlotOffsets[i])) {
+                                  origin_seen = lappend(origin_seen, varSlotOffsets[i]);
+                                  
+                                  // copy provinfo
+                                  if (varSlot->tts_provinfo != NULL) {
+                                    slot->tts_provinfo = list_concat(slot->tts_provinfo, varSlot->tts_provinfo);
+                                  }
+                                }
 			}
 		}
 	}

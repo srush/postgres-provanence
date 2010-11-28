@@ -4371,7 +4371,8 @@ open pg_statistic
 close pg_statistic
 create pg_prov 87563 without_oids
  (
- tableid = oid
+ origin_tableid = oid ,
+ dest_tableid = oid
  )
 open pg_prov
 close pg_prov

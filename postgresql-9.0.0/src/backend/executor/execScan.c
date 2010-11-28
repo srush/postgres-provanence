@@ -213,7 +213,7 @@ ExecScan(ScanState *node,
 				 */
 				resultSlot = ExecProject(projInfo, &isDone);
 				
-                                resultSlot->tts_provinfo = list_copy(slot->tts_provinfo);
+                                //resultSlot->tts_provinfo = list_copy(slot->tts_provinfo);
                                 
                                 if (resultSlot->tts_provinfo == NULL) {
                                   ereport(DEBUG5,

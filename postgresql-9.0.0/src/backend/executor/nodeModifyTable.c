@@ -150,7 +150,7 @@ ExecProcessReturning(ProjectionInfo *projectReturning,
 
 
 static void
-insert_prov(Oid tableid)
+insert_prov(Oid origin_tableid, Oid dest_tableid)
 {
 	Relation	sd;
 	sd = heap_open(ProvRelationId, RowExclusiveLock);
@@ -160,8 +160,11 @@ insert_prov(Oid tableid)
         Datum		values[Natts_pg_prov];
         bool		nulls[Natts_pg_prov];
 
-        values[0] = ObjectIdGetDatum(tableid);
+        values[0] = ObjectIdGetDatum(origin_tableid);
         nulls[0]  = false;
+
+        values[1] = ObjectIdGetDatum(dest_tableid);
+        nulls[1]  = false;
         
         stup = heap_form_tuple(RelationGetDescr(sd), values, nulls);
         simple_heap_insert(sd, stup);
@@ -196,38 +199,10 @@ ExecInsert(TupleTableSlot *slot,
 	 * writable copy
 	 */
 
-        if (slot->tts_provinfo == NULL) {
-          ereport(DEBUG5,
-                  (errcode(ERRCODE_CONFIG_FILE_ERROR),
-                   errmsg("PROV INFO NULL")));
-        } else {
-          insert_prov(((ProvInfo*)linitial((slot->tts_provinfo)))->table_id);
-          
-          ereport(DEBUG5,
-                  (errcode(ERRCODE_CONFIG_FILE_ERROR),
-                   errmsg("VIRTUAL TUPLE Came from %d"),
-                   ((ProvInfo*)linitial((slot->tts_provinfo)))->table_id
-                   ));
-        }
-
-        if (slot->tts_tuple == NULL) {
-          ereport(DEBUG5,
-                  (errcode(ERRCODE_CONFIG_FILE_ERROR),
-                   errmsg("VIRTUAL TUPLE")));
-          
-
-        } else {
-          /*
-          ereport(ERROR,
-                  (errcode(ERRCODE_CONFIG_FILE_ERROR),
-                   errmsg("Original Table is %d"),           
-                   slot->tts_tuple->t_tableOid));
-          */
-        }
+        
 
 	tuple = ExecMaterializeSlot(slot);
-		
-
+	
 
 	/*
 	 * get information on the (current) result relation
@@ -295,6 +270,8 @@ ExecInsert(TupleTableSlot *slot,
 	newId = heap_insert(resultRelationDesc, tuple,
 						estate->es_output_cid, 0, NULL);
 
+
+
 	(estate->es_processed)++;
 	estate->es_lastoid = newId;
 	setLastTid(&(tuple->t_self));
@@ -305,6 +282,40 @@ ExecInsert(TupleTableSlot *slot,
 	if (resultRelInfo->ri_NumIndices > 0)
 		recheckIndexes = ExecInsertIndexTuples(slot, &(tuple->t_self),
 											   estate);
+
+
+        // ADDING
+        if (slot->tts_provinfo == NULL) {
+          ereport(DEBUG5,
+                  (errcode(ERRCODE_CONFIG_FILE_ERROR),
+                   errmsg("PROV INFO NULL")));
+        } else {
+          ereport(DEBUG5,
+                  (errcode(ERRCODE_CONFIG_FILE_ERROR),
+                   errmsg("Pre insert VIRTUAL TUPLE Came from %d"),
+                   ((ProvInfo*)linitial((slot->tts_provinfo)))->table_id
+                   ));
+
+          insert_prov(((ProvInfo*)linitial((slot->tts_provinfo)))->table_id,
+                      tuple->t_tableOid);
+          
+        }
+
+        if (slot->tts_tuple == NULL) {
+          ereport(DEBUG5,
+                  (errcode(ERRCODE_CONFIG_FILE_ERROR),
+                   errmsg("VIRTUAL TUPLE")));
+          
+
+        } else {
+          /*
+          ereport(ERROR,
+                  (errcode(ERRCODE_CONFIG_FILE_ERROR),
+                   errmsg("Original Table is %d"),           
+                   slot->tts_tuple->t_tableOid));
+          */
+        }
+
 
 	/* AFTER ROW INSERT Triggers */
 	ExecARInsertTriggers(estate, resultRelInfo, tuple, recheckIndexes);

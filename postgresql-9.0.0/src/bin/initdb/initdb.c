@@ -1618,7 +1618,7 @@ setup_description(void)
 			 backend_exec, backend_options,
 			 DEVNULL);
 
-	PG_CMD_OPEN;
+	/*PG_CMD_OPEN;
 
 	PG_CMD_PUTS("CREATE TEMP TABLE tmp_pg_description ( "
 				"	objoid oid, "
@@ -1649,7 +1649,7 @@ setup_description(void)
 
 	PG_CMD_CLOSE;
 
-	check_ok();
+	check_ok();*/
 }
 
 /*
