@@ -450,6 +450,11 @@ ExecInitHashJoin(HashJoin *node, EState *estate, int eflags)
 		HashState  *hashstate = (HashState *) innerPlanState(hjstate);
 		TupleTableSlot *slot = hashstate->ps.ps_ResultTupleSlot;
 
+                ereport(DEBUG5,
+                        (errcode(ERRCODE_CONFIG_FILE_ERROR),
+                         errmsg("GETTING RESULT TUPLE ")));
+
+
 		hjstate->hj_HashTupleSlot = slot;
 	}
 

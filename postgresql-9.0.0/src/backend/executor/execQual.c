@@ -639,7 +639,7 @@ ExecEvalVar(ExprState *exprstate, ExprContext *econtext,
 
 		/* Skip the checking on future executions of node */
 		exprstate->evalfunc = ExecEvalScalarVar;
-
+                
 		/* Fetch the value from the slot */
 		return slot_getattr(slot, attnum, isNull);
 	}
@@ -5086,6 +5086,11 @@ ExecTargetList(List *targetlist,
 		TargetEntry *tle = (TargetEntry *) gstate->xprstate.expr;
 		AttrNumber	resind = tle->resno - 1;
 
+                ereport(DEBUG5,
+                        (errcode(ERRCODE_CONFIG_FILE_ERROR),
+                         errmsg("resindA %d", resind)));
+                
+                
 		values[resind] = ExecEvalExpr(gstate->arg,
 									  econtext,
 									  &isnull[resind],
@@ -5139,6 +5144,10 @@ ExecTargetList(List *targetlist,
 
 				if (itemIsDone[resind] == ExprEndResult)
 				{
+                                                  ereport(DEBUG5,
+                        (errcode(ERRCODE_CONFIG_FILE_ERROR),
+                         errmsg("resindB %d", resind)));
+
 					values[resind] = ExecEvalExpr(gstate->arg,
 												  econtext,
 												  &isnull[resind],
@@ -5173,6 +5182,10 @@ ExecTargetList(List *targetlist,
 
 					while (itemIsDone[resind] == ExprMultipleResult)
 					{
+                                                          ereport(DEBUG5,
+                        (errcode(ERRCODE_CONFIG_FILE_ERROR),
+                         errmsg("resindC %d", resind)));
+
 						values[resind] = ExecEvalExpr(gstate->arg,
 													  econtext,
 													  &isnull[resind],
@@ -5211,7 +5224,7 @@ ExecProject(ProjectionInfo *projInfo, ExprDoneCond *isDone)
 	TupleTableSlot *slot;
 	ExprContext *econtext;
 	int			numSimpleVars;
-
+        TupleTableSlot *provSlot;
 	/*
 	 * sanity checks
 	 */
@@ -5239,16 +5252,82 @@ ExecProject(ProjectionInfo *projInfo, ExprDoneCond *isDone)
 	 * Var-extraction loops below depend on this, and we are also prefetching
 	 * all attributes that will be referenced in the generic expressions.
 	 */
-	if (projInfo->pi_lastInnerVar > 0)
+
+        // ADDED Modified for provinfo  
+	if (projInfo->pi_lastInnerVar > 0) {
 		slot_getsomeattrs(econtext->ecxt_innertuple,
 						  projInfo->pi_lastInnerVar);
-	if (projInfo->pi_lastOuterVar > 0)
+
+                // ADDING
+                // don't add provinfo twice
+                provSlot = econtext->ecxt_innertuple;
+
+                ereport(DEBUG5,
+                        (errcode(ERRCODE_CONFIG_FILE_ERROR),
+                         errmsg("Inner Tuple %d ",
+                                list_length(provSlot->tts_provinfo))));
+
+
+                if (provSlot->tts_provinfo != NULL) {
+                  ereport(DEBUG5,
+                        (errcode(ERRCODE_CONFIG_FILE_ERROR),
+                         errmsg("Inner USED Tuple %d ",
+                                list_length(provSlot->tts_provinfo))));
+
+                  slot->tts_provinfo = list_concat(slot->tts_provinfo, provSlot->tts_provinfo);
+                }
+
+        }
+
+	if (projInfo->pi_lastOuterVar > 0) {
 		slot_getsomeattrs(econtext->ecxt_outertuple,
 						  projInfo->pi_lastOuterVar);
-	if (projInfo->pi_lastScanVar > 0)
+
+                // ADDING
+                // don't add provinfo twice
+                provSlot = econtext->ecxt_outertuple;
+
+                ereport(DEBUG5,
+                        (errcode(ERRCODE_CONFIG_FILE_ERROR),
+                         errmsg("Outer Tuple %d ",
+                                list_length(provSlot->tts_provinfo))));
+
+                if (provSlot->tts_provinfo != NULL) {
+                  ereport(DEBUG5,
+                        (errcode(ERRCODE_CONFIG_FILE_ERROR),
+                         errmsg("Outer Tuple USED Tuple %d ",
+                                list_length(provSlot->tts_provinfo))));
+
+
+                  slot->tts_provinfo = list_concat(slot->tts_provinfo, provSlot->tts_provinfo);
+                }
+
+        }
+
+	if (projInfo->pi_lastScanVar > 0) {
+          
 		slot_getsomeattrs(econtext->ecxt_scantuple,
 						  projInfo->pi_lastScanVar);
 
+                // ADDING
+                // don't add provinfo twice
+                provSlot = econtext->ecxt_scantuple;
+
+                ereport(DEBUG5,
+                        (errcode(ERRCODE_CONFIG_FILE_ERROR),
+                         errmsg("Scan Tuple %d ",
+                                list_length(provSlot->tts_provinfo))));
+
+                  if (provSlot->tts_provinfo != NULL) {
+                  
+                  ereport(DEBUG5,
+                        (errcode(ERRCODE_CONFIG_FILE_ERROR),
+                         errmsg("Scan USED Tuple %d ",
+                                list_length(provSlot->tts_provinfo))));
+
+                  slot->tts_provinfo = list_concat(slot->tts_provinfo, provSlot->tts_provinfo);
+                }
+        }
 	/*
 	 * Assign simple Vars to result by direct extraction of fields from source
 	 * slots ... a mite ugly, but fast ...
@@ -5283,18 +5362,7 @@ ExecProject(ProjectionInfo *projInfo, ExprDoneCond *isDone)
                                         (errcode(ERRCODE_CONFIG_FILE_ERROR),
                                          errmsg("Project %d %d",
                                                 i, varSlotOffsets[i])));
-                                         
-
-                                
-                                // ADDING
-                                // don't add provinfo twice
-                                if (!list_member_int(origin_seen, varSlotOffsets[i])) {
-                                  origin_seen = lappend_int(origin_seen, varSlotOffsets[i]);
-                                  // copy provinfo                                
-                                  if (varSlot->tts_provinfo != NULL) {
-                                    slot->tts_provinfo = list_concat(slot->tts_provinfo, varSlot->tts_provinfo);
-                                  }
-                                }
+                                                                        
 			}
 		}
 		else
@@ -5316,18 +5384,7 @@ ExecProject(ProjectionInfo *projInfo, ExprDoneCond *isDone)
                                 ereport(DEBUG5,
                                         (errcode(ERRCODE_DATATYPE_MISMATCH),
                                          errmsg("Project %d %d %d",
-                                                i, varSlotOffsets[i], varOutputCol)));
-
-               
-                                // ADDING
-                                if (!list_member_int(origin_seen, varSlotOffsets[i])) {
-                                  origin_seen = lappend_int(origin_seen, varSlotOffsets[i]);
-                                  
-                                  // copy provinfo
-                                  if (varSlot->tts_provinfo != NULL) {
-                                    slot->tts_provinfo = list_concat(slot->tts_provinfo, varSlot->tts_provinfo);
-                                  }
-                                }
+                                                i, varSlotOffsets[i], varOutputCol)));               
 			}
 		}
 	}

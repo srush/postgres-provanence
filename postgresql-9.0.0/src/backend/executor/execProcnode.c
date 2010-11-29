@@ -442,6 +442,9 @@ ExecProcNode(PlanState *node)
                                  errmsg("HashJoinState")));
 
 			result = ExecHashJoin((HashJoinState *) node);
+                        ereport(DEBUG5,
+                          (errcode(ERRCODE_CONFIG_FILE_ERROR),
+                                 errmsg("HashJoinState End")));
 
 			break;
 

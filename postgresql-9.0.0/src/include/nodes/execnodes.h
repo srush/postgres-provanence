@@ -145,6 +145,9 @@ typedef struct ExprContext
 
 	/* Functions to call back when ExprContext is shut down */
 	ExprContext_CB *ecxt_callbacks;
+
+  /* ADDED */
+  
 } ExprContext;
 
 /*
