@@ -428,9 +428,9 @@ do { \
  * writing the padding to disk.
  */
 #define MINIMAL_TUPLE_OFFSET \
-	((offsetof(HeapTupleHeaderData, t_infomask2) - sizeof(uint32)) / MAXIMUM_ALIGNOF * MAXIMUM_ALIGNOF)
+	((offsetof(HeapTupleHeaderData, t_infomask2) - 2 * sizeof(uint32)) / MAXIMUM_ALIGNOF * MAXIMUM_ALIGNOF)
 #define MINIMAL_TUPLE_PADDING \
-	((offsetof(HeapTupleHeaderData, t_infomask2) - sizeof(uint32)) % MAXIMUM_ALIGNOF)
+	((offsetof(HeapTupleHeaderData, t_infomask2) - 2 * sizeof(uint32)) % MAXIMUM_ALIGNOF)
 #define MINIMAL_TUPLE_DATA_OFFSET \
 	offsetof(MinimalTupleData, t_infomask2)
 
@@ -438,7 +438,10 @@ typedef struct MinimalTupleData
 {
 	uint32		t_len;			/* actual length of minimal tuple */
 
+        uint32          t_provlen;
+
 	char		mt_padding[MINIMAL_TUPLE_PADDING];
+
 
 	/* Fields below here must match HeapTupleHeaderData! */
 

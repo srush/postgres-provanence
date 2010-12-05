@@ -137,7 +137,8 @@ typedef struct TupleTableSlot
 typedef struct ProvInfo {
   NodeTag		type;
   Oid table_id;
-  int primary_key;
+  int32 num_primary_keys;
+  int32 primary_key[INDEX_MAX_KEYS];
 } ProvInfo;
 
 #define TTS_HAS_PHYSICAL_TUPLE(slot)  \

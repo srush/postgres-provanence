@@ -525,7 +525,10 @@ ExecEvalAggref(AggrefExprState *aggref, ExprContext *econtext,
 	if (econtext->ecxt_aggvalues == NULL)		/* safety check */
 		elog(ERROR, "no aggregates in this expression context");
 
+
 	*isNull = econtext->ecxt_aggnulls[aggref->aggno];
+	econtext->ecxt_provinfo = list_concat(econtext->ecxt_provinfo, 
+                                              econtext->ecxt_aggprovinfo[aggref->aggno]);
 	return econtext->ecxt_aggvalues[aggref->aggno];
 }
 
@@ -5408,9 +5411,13 @@ ExecProject(ProjectionInfo *projInfo, ExprDoneCond *isDone)
 							slot->tts_values,
 							slot->tts_isnull,
 							projInfo->pi_itemIsDone,
-							isDone))
-			return slot;		/* no more result rows, return empty slot */
-	}
+                                    isDone)) 
+                  
+                  return slot;		/* no more result rows, return empty slot */
+                slot->tts_provinfo = list_concat(slot->tts_provinfo, econtext->ecxt_provinfo);
+                
+                econtext->ecxt_provinfo = NIL;
+        }
 
 	/*
 	 * Successfully formed a result row.  Mark the result slot as containing a

@@ -48,6 +48,12 @@
 #include "utils/memutils.h"
 #include "utils/tqual.h"
 #include "catalog/pg_prov.h"
+#include "catalog/pg_type.h"
+#include "utils/array.h"
+
+#include "catalog/catalog.h"
+#include "utils/syscache.h"
+#include "utils/relcache.h"
 
 /*
  * Verify that the tuples to be produced by INSERT or UPDATE match the
@@ -150,8 +156,9 @@ ExecProcessReturning(ProjectionInfo *projectReturning,
 
 
 static void
-insert_prov(Oid origin_tableid, Oid dest_tableid)
+insert_prov(ProvInfo * provinfo , Oid dest_tableid, int num_dest_primary_keys, int dest_primary_keys[] )
 {
+        Oid origin_tableid = provinfo->table_id; 
 	Relation	sd;
 	sd = heap_open(ProvRelationId, RowExclusiveLock);
 
@@ -160,17 +167,62 @@ insert_prov(Oid origin_tableid, Oid dest_tableid)
         Datum		values[Natts_pg_prov];
         bool		nulls[Natts_pg_prov];
 
-        values[0] = ObjectIdGetDatum(origin_tableid);
-        nulls[0]  = false;
+        
+        memset(values, 0, sizeof(values));
+        memset(nulls, false, sizeof(nulls));
 
-        values[1] = ObjectIdGetDatum(dest_tableid);
-        nulls[1]  = false;
+        values[Anum_pg_prov_origin_tableid-1] = ObjectIdGetDatum(origin_tableid);
+        nulls[Anum_pg_prov_origin_tableid-1]  = false;
+
+        values[Anum_pg_prov_dest_tableid-1] = ObjectIdGetDatum(dest_tableid);
+        nulls[Anum_pg_prov_dest_tableid-1]  = false;
+
+        values[Anum_pg_prov_num_primary_keys-1] = Int32GetDatum(provinfo->num_primary_keys);
+        nulls[Anum_pg_prov_num_primary_keys-1]  = false;
+
+        // PointerGetDatum
+
+
+        {
+          int size = ARR_OVERHEAD_NONULLS(1) + (INDEX_MAX_KEYS * sizeof(int32));
+          Datum datum_arr[INDEX_MAX_KEYS];
+          int i;
+          for (i=0;i < provinfo->num_primary_keys; i++) {
+            datum_arr[i] = Int32GetDatum(provinfo->primary_key[i]);
+          }
+
+          ArrayType * keys = construct_array(datum_arr, provinfo->num_primary_keys, INT4OID, 
+                                           sizeof(int4), true, 'i');
+
+          values[Anum_pg_prov_primary_keys-1] = PointerGetDatum(keys);
+          nulls[Anum_pg_prov_primary_keys-1]  = false;
+        }
+
+        values[Anum_pg_prov_num_dest_primary_keys-1] = Int32GetDatum(num_dest_primary_keys);
+        nulls[Anum_pg_prov_num_dest_primary_keys-1]  = false;
+
+
+        {
+          Datum datum_arr[INDEX_MAX_KEYS];
+          int i;
+          for (i=0;i < num_dest_primary_keys; i++) {
+            datum_arr[i] = Int32GetDatum(dest_primary_keys[i]);
+          }
+
+          ArrayType * keys = construct_array(datum_arr, num_dest_primary_keys, INT4OID, 
+                                           sizeof(int4), true, 'i');
+
+          values[Anum_pg_prov_dest_primary_keys-1] = PointerGetDatum(keys);
+          nulls[Anum_pg_prov_dest_primary_keys-1]  = false;
+        }
         
         stup = heap_form_tuple(RelationGetDescr(sd), values, nulls);
         simple_heap_insert(sd, stup);
-
+	//CatalogUpdateIndexes(sd, stup);
+        
         heap_freetuple(stup);
-	heap_close(sd, RowExclusiveLock);
+
+        heap_close(sd, RowExclusiveLock);
 }
 
 
@@ -296,7 +348,60 @@ ExecInsert(TupleTableSlot *slot,
                    list_length(slot->tts_provinfo)
                           )));
 
+          // get destination primary keys
+          int num_dest_primary_keys;
+          int dest_primary_keys[INDEX_MAX_KEYS];
+          
+          
+
+          Relation r = RelationIdGetRelation(tuple->t_tableOid);
+          List * indexoidlist = RelationGetIndexList(r);        
+        
+          ListCell   *indexoidscan;
+          bool		result = false;
+          Form_pg_index index;
+          foreach(indexoidscan, indexoidlist)
+            {
+              Oid			indexoid = lfirst_oid(indexoidscan);
+              HeapTuple	indexTuple;
+
+              indexTuple = SearchSysCache1(INDEXRELID, ObjectIdGetDatum(indexoid));
+              if (!HeapTupleIsValid(indexTuple))		/* should not happen */
+                elog(ERROR, "cache lookup failed for index %u", indexoid);
+                index = ((Form_pg_index) GETSTRUCT(indexTuple)); 
+		result = index->indisprimary;
+                
+                
+                ReleaseSysCache(indexTuple);
+		if (result) {
+                  break;
+                }
+                
+            }
+
+          list_free(indexoidlist);
+          RelationClose(r);
+          Assert(result);
+          int i=0;
+	  num_dest_primary_keys = index->indnatts;
+	  for (i=0; i < num_dest_primary_keys; i++) {
+	    int col = index->indkey.values[i];
+	    bool is_null;
+	    Datum r = heap_getattr(tuple, col, resultRelationDesc->rd_att, &is_null);
+	    Assert(!is_null);
+	    dest_primary_keys[i] = DatumGetInt32(r);
+	  }
+
+
+          
+          // add to pg_prov
+          List * unique_list = NIL;
           foreach(l, slot->tts_provinfo) {
+            ProvInfo * prev = (ProvInfo *) lfirst(l);
+            unique_list = list_append_unique(unique_list, prev);
+          }
+
+          foreach(l, unique_list) {
             ProvInfo * prev = (ProvInfo *) lfirst(l);
 
             ereport(DEBUG5,
@@ -305,8 +410,8 @@ ExecInsert(TupleTableSlot *slot,
                      prev->table_id
                             )));
 
-            insert_prov(prev->table_id,
-                        tuple->t_tableOid);
+            insert_prov(prev,
+                        tuple->t_tableOid, num_dest_primary_keys, dest_primary_keys);
           }
         }
 

@@ -504,6 +504,7 @@ MemoryContextCreate(NodeTag tag, Size size,
 void *
 MemoryContextAlloc(MemoryContext context, Size size)
 {
+
 	AssertArg(MemoryContextIsValid(context));
 
 	if (!AllocSizeIsValid(size))

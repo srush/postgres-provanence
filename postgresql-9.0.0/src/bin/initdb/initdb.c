@@ -1811,7 +1811,7 @@ setup_schema(void)
 
 	fputs(_("creating information schema ... "), stdout);
 	fflush(stdout);
-
+        
 	lines = readfile(info_schema_file);
 
 	/*
@@ -1822,7 +1822,7 @@ setup_schema(void)
 			 backend_exec, backend_options,
 			 DEVNULL);
 
-	PG_CMD_OPEN;
+	/*PG_CMD_OPEN;
 
 	for (line = lines; *line != NULL; line++)
 	{
@@ -1852,9 +1852,8 @@ setup_schema(void)
 				   " FROM E'%s';\n",
 				   escape_quotes(features_file));
 
-	PG_CMD_CLOSE;
-
-	check_ok();
+                                   PG_CMD_CLOSE;
+                                   check_ok();*/
 }
 
 /*

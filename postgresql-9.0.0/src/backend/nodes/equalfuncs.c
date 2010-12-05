@@ -31,6 +31,7 @@
 
 #include "nodes/relation.h"
 #include "utils/datum.h"
+#include "executor/tuptable.h"
 
 
 /*
@@ -1010,6 +1011,14 @@ _equalPrivGrantee(PrivGrantee *a, PrivGrantee *b)
 	COMPARE_STRING_FIELD(rolname);
 
 	return true;
+}
+
+static bool 
+_equalProvInfo (ProvInfo  *a, ProvInfo *b) {
+  COMPARE_SCALAR_FIELD(table_id);
+  COMPARE_SCALAR_FIELD(num_primary_keys);
+  int sz = sizeof(int32)*a->num_primary_keys;
+  COMPARE_POINTER_FIELD(primary_key,sz);
 }
 
 static bool
@@ -2932,6 +2941,9 @@ equal(void *a, void *b)
 		case T_XmlSerialize:
 			retval = _equalXmlSerialize(a, b);
 			break;
+        case T_ProvInfo:
+          retval = _equalProvInfo(a,b);
+          break;
 
 		default:
 			elog(ERROR, "unrecognized node type: %d",

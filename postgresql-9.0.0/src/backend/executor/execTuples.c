@@ -96,6 +96,11 @@
 #include "utils/lsyscache.h"
 #include "utils/typcache.h"
 
+#include "catalog/catalog.h"
+#include "utils/syscache.h"
+#include "utils/relcache.h"
+void
+ExecStoreMinimalProvInfo(TupleTableSlot *slot, MinimalTuple tuple);
 
 static TupleDesc ExecTypeFromTLInternal(List *targetList,
 					   bool hasoid, bool skipjunk);
@@ -362,23 +367,63 @@ ExecStoreTuple(HeapTuple tuple,
         
         // ADDING NS
         ProvInfo * provinfo = makeNode(ProvInfo); //provinfo(tuple.t_tableOid, tuple.t_primary_key);
-        provinfo->table_id = tuple->t_tableOid;
-        provinfo->primary_key = 0;
-        slot->tts_provinfo = list_make1(provinfo);
+
+        Relation r = RelationIdGetRelation(tuple->t_tableOid);
+        List * indexoidlist = RelationGetIndexList(r);        
         
-        if (slot->tts_provinfo == NULL) {
-          ereport(ERROR,
-                  (errcode(ERRCODE_CONFIG_FILE_ERROR),
-                   errmsg("PROVINFO NULL Store ")
-                   ));
+	ListCell   *indexoidscan;
+        bool		result = false;
+	Form_pg_index index;
+        foreach(indexoidscan, indexoidlist)
+	{
+		Oid			indexoid = lfirst_oid(indexoidscan);
+		HeapTuple	indexTuple;
 
-        }
+		indexTuple = SearchSysCache1(INDEXRELID, ObjectIdGetDatum(indexoid));
+		if (!HeapTupleIsValid(indexTuple))		/* should not happen */
+			elog(ERROR, "cache lookup failed for index %u", indexoid);
+                index = ((Form_pg_index) GETSTRUCT(indexTuple)); 
+		result = index->indisprimary;
+                
+                
+                ReleaseSysCache(indexTuple);
+		if (result) {
+                  break;
+                }
+                
+	}
 
-        ereport(DEBUG5,
-                (errcode(ERRCODE_CONFIG_FILE_ERROR),
-                 errmsg("Start VIRTUAL TUPLE Came from %d",
-                 ((ProvInfo*)linitial((slot->tts_provinfo)))->table_id
-                        )));
+	list_free(indexoidlist);
+        RelationClose(r);
+
+        //
+	if (result) {
+
+	  int i=0;
+	  provinfo->num_primary_keys = index->indnatts;
+	  for (i=0; i < provinfo->num_primary_keys; i++) {
+	    int col = index->indkey.values[i];
+	    bool is_null;
+	    Datum r = heap_getattr(tuple, col, slot->tts_tupleDescriptor, &is_null);
+	    Assert(!is_null);
+	    provinfo->primary_key[i] = DatumGetInt32(r);
+	  }
+
+	
+
+
+	  provinfo->table_id = tuple->t_tableOid;
+	  //provinfo->primary_key = 0;
+	  slot->tts_provinfo = list_make1(provinfo);
+        
+	  if (slot->tts_provinfo == NULL) {
+	    ereport(ERROR,
+		    (errcode(ERRCODE_CONFIG_FILE_ERROR),
+		     errmsg("PROVINFO NULL Store ")
+		     ));
+	    
+	  }
+	}
 
 
 	/*
@@ -415,12 +460,17 @@ ExecStoreMinimalTuple(MinimalTuple mtup,
 					  TupleTableSlot *slot,
 					  bool shouldFree)
 {
+  // assume minimal tuple prov info is our info 
+
 	/*
 	 * sanity checks
 	 */
 	Assert(mtup != NULL);
 	Assert(slot != NULL);
 	Assert(slot->tts_tupleDescriptor != NULL);
+
+        ExecStoreMinimalProvInfo(slot, mtup);
+
 
 	/*
 	 * Free any old physical tuple belonging to the slot.
@@ -453,6 +503,8 @@ ExecStoreMinimalTuple(MinimalTuple mtup,
 
 	/* Mark extracted state invalid */
 	slot->tts_nvalid = 0;
+
+        
 
 	return slot;
 }
@@ -596,6 +648,101 @@ ExecCopySlotTuple(TupleTableSlot *slot)
 						   slot->tts_isnull);
 }
 
+
+void
+ExecStoreMinimalProvInfo(TupleTableSlot *slot, MinimalTuple tuple) {
+  int prov_start = tuple->t_len - tuple->t_provlen;
+
+  ProvInfo * tmp_prov = (ProvInfo *) ((void *)tuple + prov_start);
+  int len = tuple->t_provlen / sizeof(ProvInfo);
+
+  {
+    ListCell *l;
+    int i;
+    for ( i =0; i < len; i++) {
+      ProvInfo *pi = &tmp_prov[i];
+      ProvInfo * res_pi = (ProvInfo *) palloc(sizeof(ProvInfo));
+      memcpy(res_pi, pi, sizeof(ProvInfo));
+      slot->tts_provinfo = lappend(slot->tts_provinfo, res_pi);
+    }
+  }
+
+
+  {
+    ListCell *l;
+    int i =0;
+    foreach(l, slot->tts_provinfo) {
+      ProvInfo *pi = lfirst(l);
+      Assert(tmp_prov[i].table_id == pi->table_id);
+    }
+  }
+}
+
+/*
+ * Ensure tuple has prov info of slot
+ */
+MinimalTuple
+ExecCopyMinimalProvInfo(TupleTableSlot *slot, MinimalTuple tuple) {
+
+  // provinfo starts at tuple->t_len - tuple->t_provlen
+  
+  int old_provlen = tuple->t_provlen;
+  int data_len = tuple->t_len - old_provlen;
+  
+  
+  void * start = tuple + (tuple->t_len - tuple->t_provlen);
+  
+  int new_provlen = list_length(slot->tts_provinfo) * sizeof(ProvInfo);
+  int new_len = data_len + new_provlen;
+  
+  MinimalTuple result;
+  
+
+
+  result = (MinimalTuple) palloc(new_len);
+  
+  memcpy(result, tuple, data_len);
+  result->t_len = new_len;
+  result->t_provlen = new_provlen;
+
+  void * result_start = (void *) result;
+
+  int arrsize = sizeof(ProvInfo)  * list_length(slot->tts_provinfo);
+  ProvInfo * tmp_prov = palloc(arrsize) ;
+
+  {
+    ListCell *l;
+    int i =0;
+    foreach(l, slot->tts_provinfo) {
+      ProvInfo *pi = lfirst(l);
+      memcpy(&tmp_prov[i], pi, sizeof(ProvInfo));
+      i++;
+    }
+  }
+
+  heap_free_minimal_tuple(tuple);
+
+
+  memcpy(result_start + data_len, tmp_prov, arrsize );
+  
+
+  ProvInfo * in_tuple_prov;
+  in_tuple_prov = (ProvInfo*) (result_start + result->t_len - result->t_provlen);
+
+  {
+    ListCell *l;
+    int i =0;
+    foreach(l, slot->tts_provinfo) {
+      ProvInfo *pi = lfirst(l);
+      Assert(in_tuple_prov[i].table_id == pi->table_id);
+    }
+  }
+  
+  pfree(tmp_prov);  
+  return result;
+}
+
+
 /* --------------------------------
  *		ExecCopySlotMinimalTuple
  *			Obtain a copy of a slot's minimal physical tuple.  The copy is
@@ -606,27 +753,31 @@ ExecCopySlotTuple(TupleTableSlot *slot)
 MinimalTuple
 ExecCopySlotMinimalTuple(TupleTableSlot *slot)
 {
+  //return tuple always has provinfo
+
 	/*
 	 * sanity checks
 	 */
 	Assert(slot != NULL);
 	Assert(!slot->tts_isempty);
-
+        MinimalTuple ret_tuple; 
 	/*
 	 * If we have a physical tuple then just copy it.  Prefer to copy
 	 * tts_mintuple since that's a tad cheaper.
 	 */
 	if (slot->tts_mintuple)
-		return heap_copy_minimal_tuple(slot->tts_mintuple);
-	if (slot->tts_tuple)
-		return minimal_tuple_from_heap_tuple(slot->tts_tuple);
-
-	/*
-	 * Otherwise we need to build a tuple from the Datum array.
-	 */
-	return heap_form_minimal_tuple(slot->tts_tupleDescriptor,
-								   slot->tts_values,
-								   slot->tts_isnull);
+		ret_tuple = heap_copy_minimal_tuple(slot->tts_mintuple);
+	else if (slot->tts_tuple)
+		ret_tuple = minimal_tuple_from_heap_tuple(slot->tts_tuple);
+        else 
+          /*
+           * Otherwise we need to build a tuple from the Datum array.
+           */
+          ret_tuple = heap_form_minimal_tuple(slot->tts_tupleDescriptor,
+                                         slot->tts_values,
+                                         slot->tts_isnull);
+        return ExecCopyMinimalProvInfo(slot, ret_tuple);
+        
 }
 
 /* --------------------------------
@@ -692,9 +843,10 @@ ExecFetchSlotMinimalTuple(TupleTableSlot *slot)
 	/*
 	 * If we have a minimal physical tuple (local or not) then just return it.
 	 */
-	if (slot->tts_mintuple)
-		return slot->tts_mintuple;
-
+	if (slot->tts_mintuple){
+          slot->tts_mintuple = ExecCopyMinimalProvInfo(slot, slot->tts_mintuple);
+          return slot->tts_mintuple;
+        }
 	/*
 	 * Otherwise, copy or build a minimal tuple, and store it into the slot.
 	 *

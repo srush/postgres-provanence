@@ -163,18 +163,8 @@ ExecScan(ScanState *node,
 
 		slot = ExecScanFetch(node, accessMtd, recheckMtd);
                 
-                if (slot->tts_provinfo == NULL) {
-                  ereport(DEBUG5,
-                          (errcode(ERRCODE_CONFIG_FILE_ERROR),
-                           errmsg("PROVINFO NULL after ScanFetch ")
-                           ));
-
-                }
-
-
-
 		/*
-		 * if the slot returned by the accessMtd contains NULL, then it means
+		 * If the slot returned by the accessMtd contains NULL, then it means
 		 * there is nothing more to scan so we just return an empty slot,
 		 * being careful to use the projection result slot so it has correct
 		 * tupleDesc.

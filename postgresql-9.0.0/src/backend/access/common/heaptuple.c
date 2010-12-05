@@ -1441,6 +1441,11 @@ heap_form_minimal_tuple(TupleDesc tupleDescriptor,
 
 	len += data_len;
 
+
+
+        /* ADDED throw in provinfo and add size to len*/
+        // TODO
+
 	/*
 	 * Allocate and zero the space needed.
 	 */
@@ -1534,5 +1539,6 @@ minimal_tuple_from_heap_tuple(HeapTuple htup)
 	result = (MinimalTuple) palloc(len);
 	memcpy(result, (char *) htup->t_data + MINIMAL_TUPLE_OFFSET, len);
 	result->t_len = len;
+        result->t_provlen = 0;
 	return result;
 }

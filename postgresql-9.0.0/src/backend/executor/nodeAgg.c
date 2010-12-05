@@ -230,6 +230,10 @@ typedef struct AggStatePerGroupData
 	 * NULL and not auto-replace it with a later input value. Only the first
 	 * non-NULL input will be auto-substituted.
 	 */
+  
+  // ADDED tuples that make up this agg
+  List * provinfo;
+
 } AggStatePerGroupData;
 
 /*
@@ -265,7 +269,7 @@ static void process_ordered_aggregate_multi(AggState *aggstate,
 static void finalize_aggregate(AggState *aggstate,
 				   AggStatePerAgg peraggstate,
 				   AggStatePerGroup pergroupstate,
-				   Datum *resultVal, bool *resultIsNull);
+                               Datum *resultVal, bool *resultIsNull, List ** resultProvinfo);
 static Bitmapset *find_unaggregated_cols(AggState *aggstate);
 static bool find_unaggregated_cols_walker(Node *node, Bitmapset **colnos);
 static void build_hash_table(AggState *aggstate);
@@ -353,6 +357,8 @@ initialize_aggregates(AggState *aggstate,
 		 * signals that we still need to do this.
 		 */
 		pergroupstate->noTransValue = peraggstate->initValueIsNull;
+                
+                pergroupstate->provinfo = NIL;
 	}
 }
 
@@ -481,6 +487,13 @@ advance_aggregates(AggState *aggstate, AggStatePerGroup pergroup)
 
 		/* Evaluate the current input expressions for this aggregate */
 		slot = ExecProject(peraggstate->evalproj, NULL);
+                
+                // ADDING PROV
+                //if (pergroupstate->provinfo != slot->tts_provinfo) {
+                
+                pergroupstate->provinfo = list_concat(pergroupstate->provinfo, 
+                                                      list_copy(slot->tts_provinfo));
+
 
 		if (peraggstate->numSortCols > 0)
 		{
@@ -720,7 +733,7 @@ static void
 finalize_aggregate(AggState *aggstate,
 				   AggStatePerAgg peraggstate,
 				   AggStatePerGroup pergroupstate,
-				   Datum *resultVal, bool *resultIsNull)
+                                   Datum *resultVal, bool *resultIsNull, List **  resultProvinfo)
 {
 	MemoryContext oldContext;
 
@@ -747,6 +760,7 @@ finalize_aggregate(AggState *aggstate,
 		{
 			*resultVal = FunctionCallInvoke(&fcinfo);
 			*resultIsNull = fcinfo.isnull;
+
 		}
 	}
 	else
@@ -755,6 +769,7 @@ finalize_aggregate(AggState *aggstate,
 		*resultIsNull = pergroupstate->transValueIsNull;
 	}
 
+        *resultProvinfo = pergroupstate->provinfo;
 	/*
 	 * If result is pass-by-ref, make sure it is in the right context.
 	 */
@@ -1013,6 +1028,7 @@ agg_retrieve_direct(AggState *aggstate)
 	ExprContext *tmpcontext;
 	Datum	   *aggvalues;
 	bool	   *aggnulls;
+        List	   *aggprovinfo;
 	AggStatePerAgg peragg;
 	AggStatePerGroup pergroup;
 	TupleTableSlot *outerslot;
@@ -1027,6 +1043,7 @@ agg_retrieve_direct(AggState *aggstate)
 	econtext = aggstate->ss.ps.ps_ExprContext;
 	aggvalues = econtext->ecxt_aggvalues;
 	aggnulls = econtext->ecxt_aggnulls;
+        aggprovinfo = econtext->ecxt_aggprovinfo;
 	/* tmpcontext is the per-input-tuple expression context */
 	tmpcontext = aggstate->tmpcontext;
 	peragg = aggstate->peragg;
@@ -1160,7 +1177,7 @@ agg_retrieve_direct(AggState *aggstate)
 			}
 
 			finalize_aggregate(aggstate, peraggstate, pergroupstate,
-							   &aggvalues[aggno], &aggnulls[aggno]);
+                                           &aggvalues[aggno], &aggnulls[aggno], &aggprovinfo[aggno]);
 		}
 
 		/*
@@ -1254,6 +1271,7 @@ agg_retrieve_hash_table(AggState *aggstate)
 	ExprContext *econtext;
 	Datum	   *aggvalues;
 	bool	   *aggnulls;
+	List	   *aggprovinfo;
 	AggStatePerAgg peragg;
 	AggStatePerGroup pergroup;
 	AggHashEntry entry;
@@ -1267,6 +1285,7 @@ agg_retrieve_hash_table(AggState *aggstate)
 	econtext = aggstate->ss.ps.ps_ExprContext;
 	aggvalues = econtext->ecxt_aggvalues;
 	aggnulls = econtext->ecxt_aggnulls;
+	aggprovinfo = econtext->ecxt_aggprovinfo;
 	peragg = aggstate->peragg;
 	firstSlot = aggstate->ss.ss_ScanTupleSlot;
 
@@ -1313,7 +1332,7 @@ agg_retrieve_hash_table(AggState *aggstate)
 
 			Assert(peraggstate->numSortCols == 0);
 			finalize_aggregate(aggstate, peraggstate, pergroupstate,
-							   &aggvalues[aggno], &aggnulls[aggno]);
+                                           &aggvalues[aggno], &aggnulls[aggno], &aggprovinfo[aggno]);
 		}
 
 		/*
@@ -1501,6 +1520,7 @@ ExecInitAgg(Agg *node, EState *estate, int eflags)
 	econtext = aggstate->ss.ps.ps_ExprContext;
 	econtext->ecxt_aggvalues = (Datum *) palloc0(sizeof(Datum) * numaggs);
 	econtext->ecxt_aggnulls = (bool *) palloc0(sizeof(bool) * numaggs);
+        econtext->ecxt_aggprovinfo = (bool *) palloc0(sizeof(List) * numaggs);
 
 	peragg = (AggStatePerAgg) palloc0(sizeof(AggStatePerAggData) * numaggs);
 	aggstate->peragg = peragg;
@@ -1938,6 +1958,7 @@ ExecReScanAgg(AggState *node, ExprContext *exprCtxt)
 	/* Forget current agg values */
 	MemSet(econtext->ecxt_aggvalues, 0, sizeof(Datum) * node->numaggs);
 	MemSet(econtext->ecxt_aggnulls, 0, sizeof(bool) * node->numaggs);
+        MemSet(econtext->ecxt_aggprovinfo, 0, sizeof(List) * node->numaggs);
 
 	/*
 	 * Release all temp storage. Note that with AGG_HASHED, the hash table is

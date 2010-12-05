@@ -125,12 +125,16 @@ typedef struct ExprContext
 	ParamExecData *ecxt_param_exec_vals;		/* for PARAM_EXEC params */
 	ParamListInfo ecxt_param_list_info; /* for other param types */
 
+       
+       List      * ecxt_provinfo; /* output provinfo from evaluating expressions */
+
 	/*
 	 * Values to substitute for Aggref nodes in the expressions of an Agg
 	 * node, or for WindowFunc nodes within a WindowAgg node.
 	 */
 	Datum	   *ecxt_aggvalues; /* precomputed values for aggs/windowfuncs */
 	bool	   *ecxt_aggnulls;	/* null flags for aggs/windowfuncs */
+        List       **ecxt_aggprovinfo; /*provinfo associated with an agg group*/
 
 	/* Value to substitute for CaseTestExpr nodes in expression */
 	Datum		caseValue_datum;

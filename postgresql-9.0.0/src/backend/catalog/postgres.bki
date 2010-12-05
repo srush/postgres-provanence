@@ -4372,10 +4372,22 @@ close pg_statistic
 create pg_prov 87563 without_oids
  (
  origin_tableid = oid ,
- dest_tableid = oid
+ dest_tableid = oid ,
+ num_primary_keys = int4 ,
+ command_id = int4 ,
+ primary_keys = int4[] ,
+ num_dest_primary_keys = int4 ,
+ dest_primary_keys = int4[]
  )
 open pg_prov
 close pg_prov
+create pg_prov_command 87564 without_oids
+ (
+ id = int4 ,
+ sql_command = text
+ )
+open pg_prov_command
+close pg_prov_command
 create pg_rewrite 2618
  (
  rulename = name ,
