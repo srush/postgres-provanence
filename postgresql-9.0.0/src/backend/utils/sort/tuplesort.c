@@ -251,7 +251,7 @@ struct Tuplesortstate
 	 * decrease state->availMem by the amount of memory space consumed.
 	 */
 	void		(*readtup) (Tuplesortstate *state, SortTuple *stup,
-										int tapenum, unsigned int len);
+                                    int tapenum, unsigned int len, unsigned int provlen);
 
 	/*
 	 * Function to reverse the sort direction from its current state. (We
@@ -377,7 +377,7 @@ struct Tuplesortstate
 #define COMPARETUP(state,a,b)	((*(state)->comparetup) (a, b, state))
 #define COPYTUP(state,stup,tup) ((*(state)->copytup) (state, stup, tup))
 #define WRITETUP(state,tape,stup)	((*(state)->writetup) (state, tape, stup))
-#define READTUP(state,stup,tape,len) ((*(state)->readtup) (state, stup, tape, len))
+#define READTUP(state,stup,tape,len,provlen) ((*(state)->readtup) (state, stup, tape, len, provlen))
 #define REVERSEDIRECTION(state) ((*(state)->reversedirection) (state))
 #define LACKMEM(state)		((state)->availMem < 0)
 #define USEMEM(state,amt)	((state)->availMem -= (amt))
@@ -448,7 +448,7 @@ static void copytup_heap(Tuplesortstate *state, SortTuple *stup, void *tup);
 static void writetup_heap(Tuplesortstate *state, int tapenum,
 			  SortTuple *stup);
 static void readtup_heap(Tuplesortstate *state, SortTuple *stup,
-			 int tapenum, unsigned int len);
+			 int tapenum, unsigned int len, unsigned int provlen);
 static void reversedirection_heap(Tuplesortstate *state);
 static int comparetup_index_btree(const SortTuple *a, const SortTuple *b,
 					   Tuplesortstate *state);
@@ -458,7 +458,7 @@ static void copytup_index(Tuplesortstate *state, SortTuple *stup, void *tup);
 static void writetup_index(Tuplesortstate *state, int tapenum,
 			   SortTuple *stup);
 static void readtup_index(Tuplesortstate *state, SortTuple *stup,
-			  int tapenum, unsigned int len);
+			  int tapenum, unsigned int len, unsigned int provlen);
 static void reversedirection_index_btree(Tuplesortstate *state);
 static void reversedirection_index_hash(Tuplesortstate *state);
 static int comparetup_datum(const SortTuple *a, const SortTuple *b,
@@ -467,7 +467,7 @@ static void copytup_datum(Tuplesortstate *state, SortTuple *stup, void *tup);
 static void writetup_datum(Tuplesortstate *state, int tapenum,
 			   SortTuple *stup);
 static void readtup_datum(Tuplesortstate *state, SortTuple *stup,
-			  int tapenum, unsigned int len);
+			  int tapenum, unsigned int len, unsigned int provlen);
 static void reversedirection_datum(Tuplesortstate *state);
 static void free_sort_tuple(Tuplesortstate *state, SortTuple *stup);
 
@@ -1256,7 +1256,8 @@ tuplesort_gettuple_common(Tuplesortstate *state, bool forward,
 					return false;
 				if ((tuplen = getlen(state, state->result_tape, true)) != 0)
 				{
-					READTUP(state, stup, state->result_tape, tuplen);
+                                  int tupprovlen = getlen(state, state->result_tape, true);
+                                  READTUP(state, stup, state->result_tape, tuplen, tupprovlen);
 					return true;
 				}
 				else
@@ -1319,6 +1320,7 @@ tuplesort_gettuple_common(Tuplesortstate *state, bool forward,
 			}
 
 			tuplen = getlen(state, state->result_tape, false);
+			int tupprovlen = getlen(state, state->result_tape, false);
 
 			/*
 			 * Now we have the length of the prior tuple, back up and read it.
@@ -1329,9 +1331,8 @@ tuplesort_gettuple_common(Tuplesortstate *state, bool forward,
 									  state->result_tape,
 									  tuplen))
 				elog(ERROR, "bogus tuple length in backward scan");
-			READTUP(state, stup, state->result_tape, tuplen);
+			READTUP(state, stup, state->result_tape, tuplen, tupprovlen);
 			return true;
-
 		case TSS_FINALMERGE:
 			Assert(forward);
 			*should_free = true;
@@ -2010,7 +2011,8 @@ mergeprereadone(Tuplesortstate *state, int srcTape)
 			state->mergeactive[srcTape] = false;
 			break;
 		}
-		READTUP(state, &stup, srcTape, tuplen);
+                int tupprovlen = getlen(state, srcTape, true);
+		READTUP(state, &stup, srcTape, tuplen, tupprovlen);
 		/* find a free slot in memtuples[] for it */
 		tupIndex = state->mergefreelist;
 		if (tupIndex)
@@ -2652,12 +2654,15 @@ writetup_heap(Tuplesortstate *state, int tapenum, SortTuple *stup)
 	/* the part of the MinimalTuple we'll write: */
 	char	   *tupbody = (char *) tuple + MINIMAL_TUPLE_DATA_OFFSET;
 	unsigned int tupbodylen = tuple->t_len - MINIMAL_TUPLE_DATA_OFFSET;
+        unsigned int tupprovlen = tuple->t_provlen;
 
 	/* total on-disk footprint: */
 	unsigned int tuplen = tupbodylen + sizeof(int);
 
 	LogicalTapeWrite(state->tapeset, tapenum,
 					 (void *) &tuplen, sizeof(tuplen));
+        LogicalTapeWrite(state->tapeset, tapenum,
+                         (void *) &tupprovlen, sizeof(tupprovlen));
 	LogicalTapeWrite(state->tapeset, tapenum,
 					 (void *) tupbody, tupbodylen);
 	if (state->randomAccess)	/* need trailing length word? */
@@ -2670,7 +2675,7 @@ writetup_heap(Tuplesortstate *state, int tapenum, SortTuple *stup)
 
 static void
 readtup_heap(Tuplesortstate *state, SortTuple *stup,
-			 int tapenum, unsigned int len)
+             int tapenum, unsigned int len, unsigned int provlen)
 {
 	unsigned int tupbodylen = len - sizeof(int);
 	unsigned int tuplen = tupbodylen + MINIMAL_TUPLE_DATA_OFFSET;
@@ -2681,6 +2686,8 @@ readtup_heap(Tuplesortstate *state, SortTuple *stup,
 	USEMEM(state, GetMemoryChunkSpace(tuple));
 	/* read in the tuple proper */
 	tuple->t_len = tuplen;
+        tuple->t_provlen = provlen;
+
 	if (LogicalTapeRead(state->tapeset, tapenum,
 						(void *) tupbody,
 						tupbodylen) != (size_t) tupbodylen)
@@ -2927,7 +2934,7 @@ writetup_index(Tuplesortstate *state, int tapenum, SortTuple *stup)
 
 static void
 readtup_index(Tuplesortstate *state, SortTuple *stup,
-			  int tapenum, unsigned int len)
+              int tapenum, unsigned int len, unsigned int provlen)
 {
 	unsigned int tuplen = len - sizeof(unsigned int);
 	IndexTuple	tuple = (IndexTuple) palloc(tuplen);
@@ -3033,7 +3040,7 @@ writetup_datum(Tuplesortstate *state, int tapenum, SortTuple *stup)
 
 static void
 readtup_datum(Tuplesortstate *state, SortTuple *stup,
-			  int tapenum, unsigned int len)
+              int tapenum, unsigned int len, unsigned int provlen)
 {
 	unsigned int tuplen = len - sizeof(unsigned int);
 

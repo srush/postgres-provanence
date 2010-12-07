@@ -1019,6 +1019,7 @@ _equalProvInfo (ProvInfo  *a, ProvInfo *b) {
   COMPARE_SCALAR_FIELD(num_primary_keys);
   int sz = sizeof(int32)*a->num_primary_keys;
   COMPARE_POINTER_FIELD(primary_key,sz);
+  return true;
 }
 
 static bool

@@ -1282,6 +1282,7 @@ readtup_heap(Tuplestorestate *state, unsigned int len)
 	USEMEM(state, GetMemoryChunkSpace(tuple));
 	/* read in the tuple proper */
 	tuple->t_len = tuplen;
+        //tuple->t_provlen = 0;
 	if (BufFileRead(state->myfile, (void *) tupbody,
 					tupbodylen) != (size_t) tupbodylen)
 		elog(ERROR, "unexpected end of data");
