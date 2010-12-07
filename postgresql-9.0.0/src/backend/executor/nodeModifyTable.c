@@ -381,37 +381,39 @@ ExecInsert(TupleTableSlot *slot,
 
           list_free(indexoidlist);
           RelationClose(r);
-          Assert(result);
-          int i=0;
-	  num_dest_primary_keys = index->indnatts;
-	  for (i=0; i < num_dest_primary_keys; i++) {
-	    int col = index->indkey.values[i];
-	    bool is_null;
-	    Datum r = heap_getattr(tuple, col, resultRelationDesc->rd_att, &is_null);
-	    Assert(!is_null);
-	    dest_primary_keys[i] = DatumGetInt32(r);
-	  }
+          if (result) {
+          
+            int i=0;
+            num_dest_primary_keys = index->indnatts;
+            for (i=0; i < num_dest_primary_keys; i++) {
+              int col = index->indkey.values[i];
+              bool is_null;
+              Datum r = heap_getattr(tuple, col, resultRelationDesc->rd_att, &is_null);
+              Assert(!is_null);
+              dest_primary_keys[i] = DatumGetInt32(r);
+            }
 
 
           
-          // add to pg_prov
-          List * unique_list = NIL;
-          foreach(l, slot->tts_provinfo) {
-            ProvInfo * prev = (ProvInfo *) lfirst(l);
-            unique_list = list_append_unique(unique_list, prev);
-          }
+            // add to pg_prov
+            List * unique_list = NIL;
+            foreach(l, slot->tts_provinfo) {
+              ProvInfo * prev = (ProvInfo *) lfirst(l);
+              unique_list = list_append_unique(unique_list, prev);
+            }
 
-          foreach(l, unique_list) {
-            ProvInfo * prev = (ProvInfo *) lfirst(l);
+            foreach(l, unique_list) {
+              ProvInfo * prev = (ProvInfo *) lfirst(l);
 
-            ereport(DEBUG5,
-                    (errcode(ERRCODE_CONFIG_FILE_ERROR),
-                     errmsg("Pre insert VIRTUAL TUPLE Came from %d",
-                     prev->table_id
-                            )));
+              ereport(DEBUG5,
+                      (errcode(ERRCODE_CONFIG_FILE_ERROR),
+                       errmsg("Pre insert VIRTUAL TUPLE Came from %d",
+                              prev->table_id
+                              )));
 
-            insert_prov(prev,
-                        tuple->t_tableOid, num_dest_primary_keys, dest_primary_keys);
+              insert_prov(prev,
+                          tuple->t_tableOid, num_dest_primary_keys, dest_primary_keys);
+            }
           }
         }
 

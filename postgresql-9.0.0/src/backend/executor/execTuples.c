@@ -366,15 +366,16 @@ ExecStoreTuple(HeapTuple tuple,
 	slot->tts_nvalid = 0;
         
         // ADDING NS
-        ProvInfo * provinfo = makeNode(ProvInfo); //provinfo(tuple.t_tableOid, tuple.t_primary_key);
-
-        Relation r = RelationIdGetRelation(tuple->t_tableOid);
-        List * indexoidlist = RelationGetIndexList(r);        
+        if (tuple->t_tableOid) {
+          ProvInfo * provinfo = makeNode(ProvInfo); //provinfo(tuple.t_tableOid, tuple.t_primary_key);
         
-	ListCell   *indexoidscan;
-        bool		result = false;
-	Form_pg_index index;
-        foreach(indexoidscan, indexoidlist)
+          Relation r = RelationIdGetRelation(tuple->t_tableOid);
+          List * indexoidlist = RelationGetIndexList(r);        
+        
+          ListCell   *indexoidscan;
+          bool		result = false;
+          Form_pg_index index;
+          foreach(indexoidscan, indexoidlist)
 	{
 		Oid			indexoid = lfirst_oid(indexoidscan);
 		HeapTuple	indexTuple;
@@ -425,7 +426,7 @@ ExecStoreTuple(HeapTuple tuple,
 	  }
 	}
 
-
+        }
 	/*
 	 * If tuple is on a disk page, keep the page pinned as long as we hold a
 	 * pointer into it.  We assume the caller already has such a pin.
@@ -469,8 +470,6 @@ ExecStoreMinimalTuple(MinimalTuple mtup,
 	Assert(slot != NULL);
 	Assert(slot->tts_tupleDescriptor != NULL);
 
-        ExecStoreMinimalProvInfo(slot, mtup);
-
 
 	/*
 	 * Free any old physical tuple belonging to the slot.
@@ -503,8 +502,9 @@ ExecStoreMinimalTuple(MinimalTuple mtup,
 
 	/* Mark extracted state invalid */
 	slot->tts_nvalid = 0;
+        slot->tts_provinfo = NIL;
 
-        
+        ExecStoreMinimalProvInfo(slot, mtup);        
 
 	return slot;
 }
@@ -537,7 +537,8 @@ ExecClearTuple(TupleTableSlot *slot)	/* slot in which to store tuple */
 	slot->tts_mintuple = NULL;
 	slot->tts_shouldFree = false;
 	slot->tts_shouldFreeMin = false;
-
+        list_free(slot->tts_provinfo);
+        slot->tts_provinfo = NIL;
 	/*
 	 * Drop the pin on the referenced buffer, if there is one.
 	 */
@@ -655,7 +656,7 @@ ExecStoreMinimalProvInfo(TupleTableSlot *slot, MinimalTuple tuple) {
 
   ProvInfo * tmp_prov = (ProvInfo *) ((void *)tuple + prov_start);
   int len = tuple->t_provlen / sizeof(ProvInfo);
-
+  
   {
     ListCell *l;
     int i;
@@ -667,13 +668,14 @@ ExecStoreMinimalProvInfo(TupleTableSlot *slot, MinimalTuple tuple) {
     }
   }
 
-
+  Assert(list_length(slot->tts_provinfo)==len);
   {
     ListCell *l;
     int i =0;
     foreach(l, slot->tts_provinfo) {
       ProvInfo *pi = lfirst(l);
       Assert(tmp_prov[i].table_id == pi->table_id);
+      i++;
     }
   }
 }
@@ -735,6 +737,7 @@ ExecCopyMinimalProvInfo(TupleTableSlot *slot, MinimalTuple tuple) {
     foreach(l, slot->tts_provinfo) {
       ProvInfo *pi = lfirst(l);
       Assert(in_tuple_prov[i].table_id == pi->table_id);
+      i++;
     }
   }
   

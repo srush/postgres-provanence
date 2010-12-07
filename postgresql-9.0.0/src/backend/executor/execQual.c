@@ -527,8 +527,12 @@ ExecEvalAggref(AggrefExprState *aggref, ExprContext *econtext,
 
 
 	*isNull = econtext->ecxt_aggnulls[aggref->aggno];
-	econtext->ecxt_provinfo = list_concat(econtext->ecxt_provinfo, 
-                                              econtext->ecxt_aggprovinfo[aggref->aggno]);
+        
+        List * copy = 
+          list_copy(econtext->ecxt_aggprovinfo[aggref->aggno]);
+        if (econtext->ecxt_provinfo != copy) 
+          econtext->ecxt_provinfo = list_concat(econtext->ecxt_provinfo, 
+                                                copy);
 	return econtext->ecxt_aggvalues[aggref->aggno];
 }
 
@@ -5277,7 +5281,7 @@ ExecProject(ProjectionInfo *projInfo, ExprDoneCond *isDone)
                          errmsg("Inner USED Tuple %d ",
                                 list_length(provSlot->tts_provinfo))));
 
-                  slot->tts_provinfo = list_concat(slot->tts_provinfo, provSlot->tts_provinfo);
+                  slot->tts_provinfo = list_concat(slot->tts_provinfo, list_copy(provSlot->tts_provinfo));
                 }
 
         }
@@ -5302,7 +5306,7 @@ ExecProject(ProjectionInfo *projInfo, ExprDoneCond *isDone)
                                 list_length(provSlot->tts_provinfo))));
 
 
-                  slot->tts_provinfo = list_concat(slot->tts_provinfo, provSlot->tts_provinfo);
+                  slot->tts_provinfo = list_concat(slot->tts_provinfo, list_copy(provSlot->tts_provinfo));
                 }
 
         }
@@ -5328,7 +5332,7 @@ ExecProject(ProjectionInfo *projInfo, ExprDoneCond *isDone)
                          errmsg("Scan USED Tuple %d ",
                                 list_length(provSlot->tts_provinfo))));
 
-                  slot->tts_provinfo = list_concat(slot->tts_provinfo, provSlot->tts_provinfo);
+                  slot->tts_provinfo = list_concat(slot->tts_provinfo, list_copy(provSlot->tts_provinfo));
                 }
         }
 	/*
@@ -5414,7 +5418,7 @@ ExecProject(ProjectionInfo *projInfo, ExprDoneCond *isDone)
                                     isDone)) 
                   
                   return slot;		/* no more result rows, return empty slot */
-                slot->tts_provinfo = list_concat(slot->tts_provinfo, econtext->ecxt_provinfo);
+                slot->tts_provinfo = list_concat(slot->tts_provinfo, list_copy(econtext->ecxt_provinfo));
                 
                 econtext->ecxt_provinfo = NIL;
         }
