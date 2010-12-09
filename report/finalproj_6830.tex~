@@ -42,12 +42,13 @@ In this work, we modify the internals of PostgreSQL, a popular open source datab
 \textbf{XXX}: outlines added for all sections, need to fill in details everywhere
 % motivate provenance and briefly overview it
 
-A large number of applications such as scientific data management, data integration, information extraction and business analytics involve processing base data to generate a large amount of new data derived from the base data. Capturing which data items contributed to creation of a data item is important in the face of issues like the quality of base data, potential uncertainty associated with data and the authority and trust assessment of the user performing the operations. If data history is not traced, errors in early stage data collection may propagate to future derived tables. Tracking down errors and updating all tuples derived from an erroneous data item can be prohibitively costly or even impossible in the absence of this historical information.
+A large number of applications such as scientific data management, data integration, information extraction and business analytics involve processing base data to generate a large amount of new data derived from the base data. Capturing which data items contributed to creation of a new data item is important in the face of issues like questionable quality of base data, potential uncertainty associated with it, as well as the authority and trust assessment of the user performing the operations. We see that if data history is not traced in any form as the operations are performed, it would be impossible to track what future tables potential errors in early stage data collection may have propagated to. Tracking down errors and updating all tuples derived from an erroneous data item can be prohibitively costly or even impossible in the absence of this historical information.
 
 % definition of provenance and brief overview
-
+The term \textit{provenance} refers 
 The problem of storing and quering previous data history is known as \emph{provenance}. Recent work in this area includes the Trio/LIVE system and the Panda project. However, neither of these projects handle backward provenance efficiently or provide language support for querying provenance.
 
+% talk about lack of support in databases and current work
 This lack of historical record can make database systems impractical for scientific research. 
 
 One practical issue with available database systems is the difficulty of tracing data history. 
