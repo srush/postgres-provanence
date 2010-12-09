@@ -50,6 +50,10 @@ don't support stored procedures , they are black boxes, and unless something use
 
 \section{Introduction}
 
+\textbf{XXX}: outlines added for all sections, need to fill in details everywhree
+
+% motivate provenance and briefly overview it
+
 One practical issue with available database systems is the difficulty of tracing data history. This lack of historical record can make database systems impractical for scientific research. An error in early stage data collection may propagate to future derived tables. Tracking down errors and updating all tuples derived from it can be prohibitively costly or even impossible with current database systems. 
 
 The problem of storing and quering previous data history is known as \emph{provenance}. Recent work in this area includes the Trio/LIVE system and the Panda project. However, neither of these projects handle backward provenance efficiently or provide language support for querying provenance.
@@ -69,6 +73,8 @@ Recording the log is easy. The hard part is to create a provenance query languag
 \end{quote}
 
 \section{Background}
+
+% add background on what provenance is 
 
 % \begin{figure}
 %   \centering
@@ -124,6 +130,22 @@ This query returns the rows from a table at a specific revision number. This syn
 
 \section{Related Work}
 
+% detail each work briefly. There is nothing to dismiss really.
+
+~\cite{buneman00}
+
+\cite{simmhan05asurvey} 
+
+\cite{simmhan_survey} 
+
+\cite{glavic_dataprovenance}
+
+\cite{queryprov_sig2010}
+
+\cite{chapman_provstorage}
+
+\cite{plt_stanford}
+
 \begin{itemize}
 \item Trio / LIVE \cite{widom2005trio, sarma2010live} 
   
@@ -141,7 +163,11 @@ The SciDB system proposes a provenance system. Current proposals have low space 
 
 \section{System Architecture}
 
+Figure of system architecture -- provenance storage and querying.
+
 \section{Tracking Provenance inside PostgreSQL}
+
+Catalog
 
 \subsection{Simple selects - queries on One Table}
 
@@ -153,17 +179,15 @@ The SciDB system proposes a provenance system. Current proposals have low space 
 
 \section{Visualizing Forward and Backward Provenance}
 
+couple of screenshots, and one showing the graph.
+
 \section{Experiments}
 
 three graphs -- CPU, memory and storage overhead of tracking provenance averaged over a certain number of queries over the usual
 
 \section{Conclusion and Future Work}
 
-Implemented the ability to track provenance inside postgresql
-
-Implemented a visualizer that makes querying forward and backward provenance easier.
-
-don't support stored procedures , they are black boxes, and unless something useful is known about the underlying functions, we anyway do not get to know too much about them.
+Just reword the abstract.
 
 \bibliographystyle{acm}
 \bibliography{prov}
