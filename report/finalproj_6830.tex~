@@ -32,31 +32,25 @@
 \maketitle
 
 \begin{abstract}
+Many scientific and business applications require keeping detailed track of the origin of data items. Such history is referred to as provenance or lineage of data. The most basic data provenance operations involve tracking which data items an existing data item was derived from (backward data provenance) and what all data items were derived from a given data item (forward data provenance). \\
 
-Implemented the ability to track provenance inside postgresql
-
-Implemented a visualizer that makes querying forward and backward provenance easier.
-
-don't support stored procedures , they are black boxes, and unless something useful is known about the underlying functions, we anyway do not get to know too much about them.
-%  We hope to produce three tangible results from this project. 
-% 
-% \begin{enumerate}
-% \item An language extension to SQL for specifying forward and backward provenance queries.
-% \item A space-efficient algorithm for performing these queries. Our hope is to utilize query logs as opposed to expensive data structures.
-% \item An possible prototype implementation of this technique.
-% \item As possible future work, an implementation of the system in SciDB.
-% \end{enumerate}
+In this work, we modify the internals of PostgreSQL, a popular open source database, to capture data provenance for a subset of SQL DDL. We have also developed an interactive web interface to query and visualize forward and backward provenance for data items in different databases.
 \end{abstract}
 
 \section{Introduction}
 
-\textbf{XXX}: outlines added for all sections, need to fill in details everywhree
-
+\textbf{XXX}: outlines added for all sections, need to fill in details everywhere
 % motivate provenance and briefly overview it
 
-One practical issue with available database systems is the difficulty of tracing data history. This lack of historical record can make database systems impractical for scientific research. An error in early stage data collection may propagate to future derived tables. Tracking down errors and updating all tuples derived from it can be prohibitively costly or even impossible with current database systems. 
+A large number of applications such as scientific data management, data integration, information extraction and business analytics involve processing base data to generate a large amount of new data derived from the base data. Capturing which data items contributed to creation of a data item is important in the face of issues like the quality of base data, potential uncertainty associated with data and the authority and trust assessment of the user performing the operations. If data history is not traced, errors in early stage data collection may propagate to future derived tables. Tracking down errors and updating all tuples derived from an erroneous data item can be prohibitively costly or even impossible in the absence of this historical information.
+
+% definition of provenance and brief overview
 
 The problem of storing and quering previous data history is known as \emph{provenance}. Recent work in this area includes the Trio/LIVE system and the Panda project. However, neither of these projects handle backward provenance efficiently or provide language support for querying provenance.
+
+This lack of historical record can make database systems impractical for scientific research. 
+
+One practical issue with available database systems is the difficulty of tracing data history. 
 
 Our goal is to improve upon existing provenance systems, focusing on the SciDB project. The SciDB proposal \cite{stonebraker9requirements} lists three requirements for a useful provenance system -
 
@@ -71,6 +65,14 @@ In particular, we hope to respond to the challenge given by \cite{cudré2009demo
 \begin{quote}
 Recording the log is easy. The hard part is to create a provenance query language and an efficient implementation.  
 \end{quote}
+
+Contributions:
+
+Implemented the ability to track provenance inside postgresql
+
+Implemented a visualizer that makes querying forward and backward provenance easier.
+
+don't support stored procedures , they are black boxes, and unless something useful is known about the underlying functions, we anyway do not get to know too much about them.
 
 \section{Background}
 
@@ -146,7 +148,6 @@ This query returns the rows from a table at a specific revision number. This syn
 
 \cite{plt_stanford}
 
-
 \begin{itemize}
 \item Trio / LIVE \cite{widom2005trio, sarma2010live} 
   
@@ -167,7 +168,7 @@ The SciDB system proposes a provenance system. Current proposals have low space 
 Figure of system architecture -- provenance storage and querying.
 
 \section{Tracking Provenance inside PostgreSQL}
-
+% may be add code snippets here to give a preview of some stuff that had to be done inside Postgres
 Catalog
 
 \subsection{Simple selects - queries on One Table}

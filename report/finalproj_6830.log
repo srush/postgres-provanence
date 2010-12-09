@@ -1,4 +1,4 @@
-This is pdfTeXk, Version 3.141592-1.40.3 (Web2C 7.5.6) (format=pdflatex 2010.9.23)  9 DEC 2010 11:44
+This is pdfTeXk, Version 3.141592-1.40.3 (Web2C 7.5.6) (format=pdflatex 2010.9.23)  9 DEC 2010 13:00
 entering extended mode
  %&-line parsing enabled.
 **finalproj_6830.tex
@@ -391,17 +391,21 @@ File: umsb.fd 2002/01/19 v2.2g AMS font definitions
 )
 LaTeX Font Info:    Font shape `OT1/ppl/bx/n' in size <10> not available
 (Font)              Font shape `OT1/ppl/b/n' tried instead on input line 34.
-LaTeX Font Info:    Font shape `OT1/ppl/bx/n' in size <14.4> not available
-(Font)              Font shape `OT1/ppl/b/n' tried instead on input line 51.
-LaTeX Font Info:    Font shape `OT1/ppl/bx/n' in size <10.95> not available
-(Font)              Font shape `OT1/ppl/b/n' tried instead on input line 53.
-LaTeX Font Info:    Try loading font information for OMS+ppl on input line 64.
 
+Underfull \hbox (badness 10000) in paragraph at lines 35--36
+
+ []
+
+LaTeX Font Info:    Font shape `OT1/ppl/bx/n' in size <14.4> not available
+(Font)              Font shape `OT1/ppl/b/n' tried instead on input line 40.
+LaTeX Font Info:    Font shape `OT1/ppl/bx/n' in size <10.95> not available
+(Font)              Font shape `OT1/ppl/b/n' tried instead on input line 42.
+LaTeX Font Info:    Try loading font information for OMS+ppl on input line 56.
 (/usr/share/texmf/tex/latex/psnfss/omsppl.fd
 File: omsppl.fd 
 )
 LaTeX Font Info:    Font shape `OMS/ppl/m/n' in size <10.95> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 64.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 56.
  [1
 
 {/usr/share/texmf/fonts/map/pdftex/updmap/pdftex.map}]
@@ -415,18 +419,19 @@ File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
 ) [2]
 LaTeX Font Info:    Font shape `OT1/ppl/bx/n' in size <12> not available
 (Font)              Font shape `OT1/ppl/b/n' tried instead on input line 172.
- (./finalproj_6830.bbl
-[3]
+ [3] (./finalproj_6830.bbl
 Missing character: There is no â in font pplr7t!
 Missing character: There is no ˆ in font pplr7t!
 Missing character: There is no — in font pplr7t!
 Missing character: There is no â in font pplri7t!
 Missing character: There is no € in font pplri7t!
 Missing character: There is no ™ in font pplri7t!
+
+[4]
 Missing character: There is no â in font pplri7t!
 Missing character: There is no € in font pplri7t!
 Missing character: There is no ™ in font pplri7t!
-) [4] (./finalproj_6830.aux)
+) [5] (./finalproj_6830.aux)
 
 LaTeX Warning: There were undefined references.
 
@@ -438,16 +443,16 @@ Here is how much of TeX's memory you used:
  8477 multiletter control sequences out of 10000+200000
  21345 words of font info for 61 fonts, out of 1200000 for 2000
  645 hyphenation exceptions out of 8191
- 45i,6n,41p,444b,217s stack positions out of 5000i,500n,6000p,200000b,15000s
+ 45i,6n,41p,785b,219s stack positions out of 5000i,500n,6000p,200000b,15000s
 {/usr/share/texmf/fonts/enc/dvips/base/8r.enc}</usr/share/texmf/fonts/type1/b
 luesky/cm/cmmi10.pfb></usr/share/texmf/fonts/type1/bluesky/cm/cmr10.pfb></usr/s
 hare/texmf/fonts/type1/bluesky/cm/cmsy10.pfb></usr/share/texmf/fonts/type1/urw/
 courier/ucrr8a.pfb></usr/share/texmf/fonts/type1/urw/palatino/uplb8a.pfb></usr/
 share/texmf/fonts/type1/urw/palatino/uplr8a.pfb></usr/share/texmf/fonts/type1/u
 rw/palatino/uplri8a.pfb>
-Output written on finalproj_6830.pdf (4 pages, 95945 bytes).
+Output written on finalproj_6830.pdf (5 pages, 97480 bytes).
 PDF statistics:
- 44 PDF objects out of 1000 (max. 8388607)
+ 47 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 131072)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 
