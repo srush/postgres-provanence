@@ -1,0 +1,74 @@
+\begin{thebibliography}{10}
+
+\bibitem{plt_stanford}
+Practical lineage tracing in data warehouses.
+\newblock In {\em Proceedings of the 16th International Conference on Data
+  Engineering\/} (Washington, DC, USA, 2000), IEEE Computer Society, pp.~367--.
+
+\bibitem{buneman00}
+{\sc Buneman, P., Khanna, S., and chiew Tan, W.}
+\newblock Data provenance: some basic issues.
+\newblock In {\em In Foundations of Software Technology and Theoretical
+  Computer Science\/} (2000), Springer, pp.~87--93.
+
+\bibitem{chapman_provstorage}
+{\sc Chapman, A.~P., Jagadish, H.~V., and Ramanan, P.}
+\newblock Efficient provenance storage.
+\newblock In {\em Proceedings of the 2008 ACM SIGMOD international conference
+  on Management of data\/} (New York, NY, USA, 2008), SIGMOD '08, ACM,
+  pp.~993--1006.
+
+\bibitem{cudré2009demonstration}
+{\sc Cudr{\'e}-Mauroux, P., Kimura, H., Lim, K., Rogers, J., Simakov, R.,
+  Soroush, E., Velikhov, P., Wang, D., Balazinska, M., Becla, J., et~al.}
+\newblock {A demonstration of SciDB: a science-oriented DBMS}.
+\newblock {\em Proceedings of the VLDB Endowment 2}, 2 (2009), 1534--1537.
+
+\bibitem{glavic_dataprovenance}
+{\sc Glavic, B., and Dittrich, K.}
+\newblock Data provenance: A categorization of existing approaches ∗.
+
+\bibitem{ikeda2010panda}
+{\sc Ikeda, R., and Widom, J.}
+\newblock {Panda: A system for provenance and data}.
+\newblock In {\em Proceedings of the 2nd USENIX Workshop on the Theory and
+  Practice of Provenance (TaPP’10)\/} (2010).
+
+\bibitem{queryprov_sig2010}
+{\sc Karvounarakis, G., Ives, Z.~G., and Tannen, V.}
+\newblock Querying data provenance.
+\newblock In {\em Proceedings of the 2010 international conference on
+  Management of data\/} (New York, NY, USA, 2010), SIGMOD '10, ACM,
+  pp.~951--962.
+
+\bibitem{sarma2010live}
+{\sc Sarma, A., Theobald, M., and Widom, J.}
+\newblock {LIVE: A lineage-supported versioned DBMS}.
+\newblock In {\em Scientific and Statistical Database Management: 22nd
+  International Conference, Ssdbm 2010, Heidelberg, Germany, June 30-July 2,
+  2010, Proceedings\/} (2010), p.~416.
+
+\bibitem{simmhan_survey}
+{\sc Simmhan, Y.~L., Plale, B., and Gannon, D.}
+\newblock A survey of data provenance in e-science.
+\newblock {\em SIGMOD Record 34\/} (2005), 31--36.
+
+\bibitem{simmhan05asurvey}
+{\sc Simmhan, Y.~L., Plale, B., and Gannon, D.}
+\newblock A survey of data provenance techniques.
+\newblock Tech. rep., 2005.
+
+\bibitem{stonebraker9requirements}
+{\sc Stonebraker, M., Becla, J., Dewitt, D., Lim, K., Maier, D., Ratzesberger,
+  O., and Zdonik, S.}
+\newblock {Requirements for science data bases and SciDB}.
+\newblock In {\em 4th Biennial Conference on Innovative Data Systems Research
+  (CIDR’09)}.
+
+\bibitem{widom2005trio}
+{\sc Widom, J.}
+\newblock {Trio: A system for integrated management of data, accuracy, and
+  lineage}.
+\newblock Citeseer.
+
+\end{thebibliography}

@@ -1,0 +1,193 @@
+\documentclass[11pt]{article}
+
+\usepackage{amsmath, amsthm, amssymb}
+\usepackage{graphicx}    % needed for including graphics e.g. EPS, PS
+\usepackage{palatino}
+\usepackage{tikz}
+
+\usetikzlibrary{arrows}
+\usetikzlibrary{automata}
+%\usetikzlibrary{positioning}
+
+\topmargin -1.5cm        % read Lamport p.163
+\oddsidemargin -0.04cm   % read Lamport p.163
+\evensidemargin -0.04cm  % same as oddsidemargin but for left-hand pages
+\textwidth 16.59cm
+\textheight 23.04cm 
+%  %\pagestyle{empty}       % Uncomment if don't want page numbers
+\parskip 7.2pt           % sets spacing between paragraphs
+%  %\renewcommand{\baselinestretch}{1.5} 	% Uncomment for 1.5 spacing between lines
+\parindent 0pt		  % sets leading space for paragraphs
+
+% \addtolength{\textwidth}{1in}
+% \addtolength{\hoffset}{-1in}
+% \addtolength{\textheight}{1in}
+% \addtolength{\voffset}{-1in}
+
+\title{Tracking and Visualizing Provenance using PostgreSQL}
+\author{Alexander Rush (srush@mit.edu)\\ Nirmesh Malviya (nirmesh@mit.edu)}
+%\date{}
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+
+Implemented the ability to track provenance inside postgresql
+
+Implemented a visualizer that makes querying forward and backward provenance easier.
+
+don't support stored procedures , they are black boxes, and unless something useful is known about the underlying functions, we anyway do not get to know too much about them.
+%  We hope to produce three tangible results from this project. 
+% 
+% \begin{enumerate}
+% \item An language extension to SQL for specifying forward and backward provenance queries.
+% \item A space-efficient algorithm for performing these queries. Our hope is to utilize query logs as opposed to expensive data structures.
+% \item An possible prototype implementation of this technique.
+% \item As possible future work, an implementation of the system in SciDB.
+% \end{enumerate}
+\end{abstract}
+
+\section{Introduction}
+
+\textbf{XXX}: outlines added for all sections, need to fill in details everywhree
+
+% motivate provenance and briefly overview it
+
+One practical issue with available database systems is the difficulty of tracing data history. This lack of historical record can make database systems impractical for scientific research. An error in early stage data collection may propagate to future derived tables. Tracking down errors and updating all tuples derived from it can be prohibitively costly or even impossible with current database systems. 
+
+The problem of storing and quering previous data history is known as \emph{provenance}. Recent work in this area includes the Trio/LIVE system and the Panda project. However, neither of these projects handle backward provenance efficiently or provide language support for querying provenance.
+
+Our goal is to improve upon existing provenance systems, focusing on the SciDB project. The SciDB proposal \cite{stonebraker9requirements} lists three requirements for a useful provenance system -
+
+\begin{itemize}
+\item For any data element, we would like to recover the derivation history. 
+\item If a data element is updated, we would like to trace forward to see other effected elements.
+\item At any point, we would like to reproduce the construction of the current data. 
+\end{itemize}
+
+In particular, we hope to respond to the challenge given by \cite{cudré2009demonstration}.
+
+\begin{quote}
+Recording the log is easy. The hard part is to create a provenance query language and an efficient implementation.  
+\end{quote}
+
+\section{Background}
+
+% add background on what provenance is 
+
+% \begin{figure}
+%   \centering
+%   \label{diag}
+%   \begin{tikzpicture}
+%     \node (s1) [draw]{s1};
+% 
+%     \node (s2) [draw,above right= of s1]{s2};
+%     \node (s3) [draw,below right= of s1]{s3};
+%     \node (s4) [draw, right= of s3]{s4};
+%     \path [->] (s1) edge[thick] (s2);    
+%     \path [->] (s1) edge[thick] (s3);    
+%     \path [->] (s3) edge[thick] (s4);    
+% 
+%     \path [->] (s4) edge[thick, bend right = 50, dotted] (s3);    
+%     \path [->] (s3) edge[thick, bend right = 50, dotted] (s1);    
+%   \end{tikzpicture}
+%   \begin{tikzpicture}
+%     \node (s1) [draw]{s1};
+% 
+%     \node (s2) [draw,above right= of s1]{s2};
+%     \node (s3) [draw,below right= of s1]{s3};
+%     \node (s4) [draw, right= of s3]{s4};
+%     \path [->] (s1) edge[thick] (s2);    
+%     \path [->] (s1) edge[thick] (s3);    
+%     \path [->] (s3) edge[thick] (s4);    
+% 
+%     \path [<-] (s4) edge[thick, bend right = 50, dotted] (s3);    
+%     \path [<-] (s3) edge[thick, bend right = 50, dotted] (s1);    
+%     \path [<-] (s2) edge[thick, bend right = 50, dotted] (s1);    
+%   \end{tikzpicture}
+% 
+%   \caption{(a) Forward provenance (b) Backward provenance}
+% 
+% \end{figure}
+
+
+There are two types of provenance queries, forward and backward provenance. In forward provenance, given some data element, we ask what data elements were produced from it and what processing operations were applied to it. In backward provenance, given some data element, we ask where it originally came from and what processing led to its creation. 
+
+Fig~\ref{diag} shows examples of these two queries. We assume that our original data is $s1$, it leads to $s2$ and $s3$. In turn, $s4$ is derived from $ s3$. Our forward query from $ s1$ leads to each of the other data elements, while the backward query from  $s4$ leads back to the root.  
+
+In the LIVE provenance system built as part of the Trio project, the database stores a back pointer for each derived data element. In our example, it would store $(s1, s2)$, $(s1, s3)$, and $(s3, s4)$ explicitly. It can then perform very efficient backwards queries by walking along this tree. Unfortunately, this technique requires storing a derivation pair for each derived and its parents, which can be very expensive.  
+
+The SciDB proposal suggests a different way to implement provenance. For forward queries, the propose using the databases version control system and following forward deltas. They note that backward provenance is more difficult to implement. Two possible methods they mention are to also include backward deltas as part of version control or to implement an algorithm which can reverse the queries from the log. 
+
+The other open quesion surrounding provenance is how to include provenance queries within SQL. There have been relatively few proposed solutions for this problem. The LIVE system implements a keyword ``valid at'' which queries a data element at a specific revision. For instance the query:
+
+\begin{verbatim}
+SELECT * FROM <table-name> VALID AT <revision-number>
+\end{verbatim}
+
+This query returns the rows from a table at a specific revision number. This syntax allows a query to access a revision, but does not allow us to specify a provenance query the directly. 
+
+\section{Related Work}
+
+~\cite{buneman00}
+
+\cite{simmhan05asurvey} 
+
+\cite{simmhan_survey} 
+
+\cite{glavic_dataprovenance}
+
+\cite{queryprov_sig2010}
+
+\cite{chapman_provstorage}
+
+\cite{plt_stanford}
+
+
+\begin{itemize}
+\item Trio / LIVE \cite{widom2005trio, sarma2010live} 
+  
+Implements a technique for backward provenance by connecting derived tuples to the previous tuples. Unfortunately, this technique has very high space complexity and may not scale in practice. 
+
+\item Panda \cite{ikeda2010panda} 
+
+Panda is an early stage proposal for a general provenance system for data. This system does not propose a practical algorithm or language features for provenance. 
+
+\item SciDB \cite{cudré2009demonstration}
+
+The SciDB system proposes a provenance system. Current proposals have low space complexity but with non-trivial query time. 
+
+\end{itemize}
+
+\section{System Architecture}
+
+Figure of system architecture -- provenance storage and querying.
+
+\section{Tracking Provenance inside PostgreSQL}
+
+Catalog
+
+\subsection{Simple selects - queries on One Table}
+
+\subsection{Handling joins}
+
+\subsection{Aggregates}
+
+\subsection{Changes to the storage manager for disk based workloads}
+
+\section{Visualizing Forward and Backward Provenance}
+
+couple of screenshots, and one showing the graph.
+
+\section{Experiments}
+
+three graphs -- CPU, memory and storage overhead of tracking provenance averaged over a certain number of queries over the usual
+
+\section{Conclusion and Future Work}
+
+Just reword the abstract.
+
+\bibliographystyle{acm}
+\bibliography{prov}
+\end{document}
