@@ -19,6 +19,7 @@ from itertools import *
 #  num_dest_primary_keys | integer   | 
 #  dest_primary_keys     | integer[] | 
 
+colors = ["red", "green", "blue", "purple", "brown", "orange"]
 
 class AjaxApp(object):
     def get_generic(self, conn, table_name, prim_atts, prim_vals):
@@ -45,8 +46,8 @@ class AjaxApp(object):
       
       res = cur.fetchone()
       print >>out, "<a href='?tablename=%s&primary_key=%s'>"%(table,key)
-      print >>out, "<table style='margin: 15px; padding:3px; border :2px solid;'>"
-      print >>out, "<tr><th style ='padding:5px; font:20px; border:1px solid;' colspan=2>%s</th></tr>"%(table)
+      print >>out, "<table style='margin: 15px; padding:3px; border :3px solid; '>"
+      print >>out, "<tr><th style =' ' colspan=2><div style='padding:5px; font:20px; border:2px solid %s;'>%s</div></th></tr>"%(colors[table.__hash__()%len(colors)], table)
       
       for des, col in izip(cur.description, res):
         print >>out, "<tr>"
@@ -191,7 +192,7 @@ class AjaxApp(object):
       G.graph_attr['rankdir']='LR'
 
       i =0
-      colors = ["red", "green", "blue", "purple", "yellow", "orange"]
+
       for row  in cur:
         print >>out, row
         (o_prim, d_prim, o_id, d_id, o_rel, d_rel) = row

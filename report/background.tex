@@ -1,0 +1,53 @@
+% add background on what provenance is 
+
+% \begin{figure}
+%   \centering
+%   \label{diag}
+%   \begin{tikzpicture}
+%     \node (s1) [draw]{s1};
+% 
+%     \node (s2) [draw,above right= of s1]{s2};
+%     \node (s3) [draw,below right= of s1]{s3};
+%     \node (s4) [draw, right= of s3]{s4};
+%     \path [->] (s1) edge[thick] (s2);    
+%     \path [->] (s1) edge[thick] (s3);    
+%     \path [->] (s3) edge[thick] (s4);    
+% 
+%     \path [->] (s4) edge[thick, bend right = 50, dotted] (s3);    
+%     \path [->] (s3) edge[thick, bend right = 50, dotted] (s1);    
+%   \end{tikzpicture}
+%   \begin{tikzpicture}
+%     \node (s1) [draw]{s1};
+% 
+%     \node (s2) [draw,above right= of s1]{s2};
+%     \node (s3) [draw,below right= of s1]{s3};
+%     \node (s4) [draw, right= of s3]{s4};
+%     \path [->] (s1) edge[thick] (s2);    
+%     \path [->] (s1) edge[thick] (s3);    
+%     \path [->] (s3) edge[thick] (s4);    
+% 
+%     \path [<-] (s4) edge[thick, bend right = 50, dotted] (s3);    
+%     \path [<-] (s3) edge[thick, bend right = 50, dotted] (s1);    
+%     \path [<-] (s2) edge[thick, bend right = 50, dotted] (s1);    
+%   \end{tikzpicture}
+% 
+%   \caption{(a) Forward provenance (b) Backward provenance}
+% 
+% \end{figure}
+
+
+There are two types of provenance queries, forward and backward provenance. In forward provenance, given some data element, we ask what data elements were produced from it and what processing operations were applied to it. In backward provenance, given some data element, we ask where it originally came from and what processing led to its creation. 
+
+Fig~\ref{diag} shows examples of these two queries. We assume that our original data is $s1$, it leads to $s2$ and $s3$. In turn, $s4$ is derived from $ s3$. Our forward query from $ s1$ leads to each of the other data elements, while the backward query from  $s4$ leads back to the root.  
+
+In the LIVE provenance system built as part of the Trio project, the database stores a back pointer for each derived data element. In our example, it would store $(s1, s2)$, $(s1, s3)$, and $(s3, s4)$ explicitly. It can then perform very efficient backwards queries by walking along this tree. Unfortunately, this technique requires storing a derivation pair for each derived and its parents, which can be very expensive.  
+
+The SciDB proposal suggests a different way to implement provenance. For forward queries, the propose using the databases version control system and following forward deltas. They note that backward provenance is more difficult to implement. Two possible methods they mention are to also include backward deltas as part of version control or to implement an algorithm which can reverse the queries from the log. 
+
+The other open quesion surrounding provenance is how to include provenance queries within SQL. There have been relatively few proposed solutions for this problem. The LIVE system implements a keyword ``valid at'' which queries a data element at a specific revision. For instance the query:
+
+\begin{verbatim}
+SELECT * FROM <table-name> VALID AT <revision-number>
+\end{verbatim}
+
+This query returns the rows from a table at a specific revision number. This syntax allows a query to access a revision, but does not allow us to specify a provenance query the directly. 
