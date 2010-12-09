@@ -1,4 +1,5 @@
 % add background on what provenance is 
+% add a diagram
 
 % \begin{figure}
 %   \centering
@@ -31,23 +32,24 @@
 %     \path [<-] (s2) edge[thick, bend right = 50, dotted] (s1);    
 %   \end{tikzpicture}
 % 
-%   \caption{(a) Forward provenance (b) Backward provenance}
+%   \caption{(a) Backward provenance (b) Forward provenance}
 % 
 % \end{figure}
 
+The term \textit{provenance} or \textit{lineage} of data broadly refers to what source a data item came from, what transformations were applied on the original data to arrive at the current data item, how the current data item has been updated over time and what other data items might have been derived from the current data item. Broadly speaking, provenance information belongs to one of two categories: \textit{source provenance} and \textit{transformation provenance}~\cite{tan_ieee04}. Source provenance refers to source data from which a data element was derived, whereas transformation provenance is concerned with the different processes or operations that were used to arrive at the data element starting from the source data. A slightly different characterization~\cite{ikeda2010panda} classifies provenance as mostly either \text{data-based}, in which well defined data models are used to track fine-grained provenance of data elements, or \text{process-based}, where the processes generating a data element along with coarse-grained provenance is captured. 
 
-There are two types of provenance queries, forward and backward provenance. In forward provenance, given some data element, we ask what data elements were produced from it and what processing operations were applied to it. In backward provenance, given some data element, we ask where it originally came from and what processing led to its creation. 
+The proposal for the SciDB project\cite{stonebraker9requirements} lists three requirements for a useful provenance system:
 
-Fig~\ref{diag} shows examples of these two queries. We assume that our original data is $s1$, it leads to $s2$ and $s3$. In turn, $s4$ is derived from $ s3$. Our forward query from $ s1$ leads to each of the other data elements, while the backward query from  $s4$ leads back to the root.  
+\begin{itemize}
+\item For any data element, we would like to recover the \textbf{derivation history}. This would be helpful in identifying if a data element originated from a suspect or unreliable data source.
+\item If a data element is found to have had value some value in error, we would like to trace forward to see what other data elements could have been affected from the element's previous erroneous value. If a portion of data is identified as erroneous, we can use this to determine what other data elements in the data store have values that cannot be relied on as a result of this.
+\item At any point, we would like to reproduce the construction of the current data in the data store. This would be of use in propagating updates downstream when data element errors are identified and corrected.
+\end{itemize}
 
-In the LIVE provenance system built as part of the Trio project, the database stores a back pointer for each derived data element. In our example, it would store $(s1, s2)$, $(s1, s3)$, and $(s3, s4)$ explicitly. It can then perform very efficient backwards queries by walking along this tree. Unfortunately, this technique requires storing a derivation pair for each derived and its parents, which can be very expensive.  
+Thus we can have two types of provenance queries, \textit{forward} and \textit{backward} provenance. In forward provenance, given some data element, we ask what data elements were produced from it (and optionally what processing operations were applied to them during the element's creation). In backward provenance, given some data element, we ask where it originally came from (and optionally what processing led to its creation). 
 
-The SciDB proposal suggests a different way to implement provenance. For forward queries, the propose using the databases version control system and following forward deltas. They note that backward provenance is more difficult to implement. Two possible methods they mention are to also include backward deltas as part of version control or to implement an algorithm which can reverse the queries from the log. 
+Fig~\ref{diag} shows examples of these two queries. We assume that our original data is $s1$, it leads to $s2$ and $s3$. In turn, $s4$ is derived from $ s3$. Our forward query from $ s1$ leads to each of the other data elements, while the backward query from  $s4$ leads back to the root. 
 
-The other open quesion surrounding provenance is how to include provenance queries within SQL. There have been relatively few proposed solutions for this problem. The LIVE system implements a keyword ``valid at'' which queries a data element at a specific revision. For instance the query:
+Provenance can either be computed and stored eagerly by capturing forward and backward data pointers (for example~\cite{widom2005trio}) or lazily by just recording the query log along with a knowledge of inversion operations~\cite{stonebraker9requirements}. 
 
-\begin{verbatim}
-SELECT * FROM <table-name> VALID AT <revision-number>
-\end{verbatim}
-
-This query returns the rows from a table at a specific revision number. This syntax allows a query to access a revision, but does not allow us to specify a provenance query the directly. 
+A more detailed survey of data provenance approaches, including a discussion of conceptual properties of provenance models and different storage and recording strategies can be found in \cite{glavic_dataprovenance}. The two strategies have vastly different storage requirements and query efficiency. We discuss some work on this in Section~\ref{related}.

@@ -4,6 +4,7 @@
 \usepackage{graphicx}    % needed for including graphics e.g. EPS, PS
 \usepackage{palatino}
 \usepackage{tikz}
+\usepackage{url, hyperref}
 
 \usetikzlibrary{arrows}
 \usetikzlibrary{automata}
@@ -40,29 +41,31 @@ In this work, we modify the internals of PostgreSQL, a popular open source datab
 \section{Introduction}
 \input{intro}
 
-\section{Background}
+\section{Background} \label{background}
 \input{background}
 
-\section{Related Work}
+ \section{Related Work}	\label{related}
 \input{related}
 
-\section{System Architecture}
+\section{System Architecture} \label{archi}
 
 \input{arch}
 
 
-\section{Tracking Provenance inside PostgreSQL}
+\section{Tracking Provenance inside PostgreSQL} \label{implement}
 
 \input{track}
-\section{Visualizing Forward and Backward Provenance}
+\section{Visualizing Forward and Backward Provenance} \label{visualizer}
 
 couple of screenshots, and one showing the graph.
+
+don't support stored procedures , they are black boxes, and unless something useful is known about the underlying functions, we anyway do not get to know too much about them.
 
 %\section{Experiments}
 
 %three graphs -- CPU, memory and storage overhead of tracking provenance averaged over a certain number of queries over the usual
 
-\section{Conclusion and Future Work}
+\section{Conclusion and Future Work}	\label{conclude}
 
 \input{conclusion}
 
