@@ -1,13 +1,16 @@
-CREATE TABLE q8_1 (a SERIAL primary key, id int, yr int);
+CREATE TABLE q8_1 (a SERIAL primary key, id int, amount int, yr int);
 
-INSERT INTO q8_1 (id, yr)
-SELECT researchers.id, extract('year' from started) AS yr 
+
+
+
+INSERT INTO q8_1 (id, amount, yr)
+SELECT researchers.id, SUM(amount), extract('year' from started) AS yr 
 FROM grants, grant_researchers, researchers, orgs 
 WHERE grants.id=grant_researchers.grantid 
 AND grant_researchers.researcherid=researchers.id 
 AND researchers.org=orgs.id 
 AND orgs.name LIKE '%Massachusetts Institute of Technology%'
-GROUP BY researchers.id, yr 
+GROUP BY researchers.id, yr
 HAVING SUM(amount)>1000000;
 
 CREATE TABLE q8_2 (a SERIAL primary key, id int , year1 int, year3 int);
@@ -21,7 +24,7 @@ WHERE t1.id=t3.id AND t3.yr=t1.yr+2;
 CREATE TABLE q8_3 (id SERIAL primary key, rname char(50));
 
 INSERT INTO q8_3(rname)
-SELECT DISTINCT r_out.name
+SELECT r_out.name
 FROM researchers r_out, q8_2 
 WHERE r_out.id=q8_2.id 
 AND year1+1 NOT IN 
@@ -31,10 +34,11 @@ WHERE grants.id=grant_researchers.grantid
 AND grant_researchers.researcherid=r_in.id
 AND r_in.id=r_out.id);
 
-select * from q8_3;
+/*select * from q8_1;*/
 
 select * from pg_prov;
 
 /*drop table q8_1;
 drop table q8_2;
+
 drop table q8_3;*/
