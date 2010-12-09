@@ -24,7 +24,7 @@
 % \addtolength{\textheight}{1in}
 % \addtolength{\voffset}{-1in}
 
-\title{Visualizing and Tracking Provenance using PostgreSQL}
+\title{Tracking and Visualizing Provenance using PostgreSQL}
 \author{Alexander Rush (srush@mit.edu)\\ Nirmesh Malviya (nirmesh@mit.edu)}
 %\date{}
 \begin{document}
@@ -32,14 +32,20 @@
 \maketitle
 
 \begin{abstract}
- We hope to produce three tangible results from this project. 
 
-\begin{enumerate}
-\item An language extension to SQL for specifying forward and backward provenance queries.
-\item A space-efficient algorithm for performing these queries. Our hope is to utilize query logs as opposed to expensive data structures.
-\item An possible prototype implementation of this technique.
-\item As possible future work, an implementation of the system in SciDB.
-\end{enumerate}
+Implemented the ability to track provenance inside postgresql
+
+Implemented a visualizer that makes querying forward and backward provenance easier.
+
+don't support stored procedures , they are black boxes, and unless something useful is known about the underlying functions, we anyway do not get to know too much about them.
+%  We hope to produce three tangible results from this project. 
+% 
+% \begin{enumerate}
+% \item An language extension to SQL for specifying forward and backward provenance queries.
+% \item A space-efficient algorithm for performing these queries. Our hope is to utilize query logs as opposed to expensive data structures.
+% \item An possible prototype implementation of this technique.
+% \item As possible future work, an implementation of the system in SciDB.
+% \end{enumerate}
 \end{abstract}
 
 \section{Introduction}
@@ -136,6 +142,14 @@ The SciDB system proposes a provenance system. Current proposals have low space 
 \section{System Architecture}
 
 \section{Tracking Provenance inside PostgreSQL}
+
+\subsection{Simple selects - queries on One Table}
+
+\subsection{Handling joins}
+
+\subsection{Aggregates}
+
+\subsection{Changes to the storage manager for disk based workloads}
 
 \section{Visualizing Forward and Backward Provenance}
 
