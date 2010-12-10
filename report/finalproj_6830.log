@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2010.11.17)  9 DEC 2010 16:44
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2010.11.17)  9 DEC 2010 18:52
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -346,7 +346,42 @@ File: pgfmodulematrix.code.tex 2008/01/15  (rcs-revision 1.1)
 (/usr/share/texmf/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibrarytopat
 hs.code.tex
 File: tikzlibrarytopaths.code.tex 2008/01/09 v2.00 (rcs-revision 1.1)
-)))
+))) (/usr/share/texmf/tex/latex/tikz-qtree/tikz-qtree.sty
+(/usr/share/texmf/tex/latex/tikz-qtree/pgftree.sty
+(/usr/share/texmf/tex/latex/tikz-qtree/pgfsubpic.sty
+(/usr/share/texmf/tex/latex/tikz-qtree/pgfsubpic.tex
+\pgf@subpicminx=\dimen157
+\pgf@subpicminy=\dimen158
+\pgf@subpicmaxx=\dimen159
+\pgf@subpicmaxy=\dimen160
+))
+(/usr/share/texmf/tex/latex/tikz-qtree/pgftree.tex
+\levelsep=\dimen161
+\subtreesep=\dimen162
+\pgftree@childx=\dimen163
+\pgftree@savechildx=\dimen164
+\pgftree@childy=\dimen165
+\pgftree@savechildy=\dimen166
+\pgftree@childi=\count120
+\pgftree@savechildi=\count121
+\pgf@subpic@hbox@children=\box36
+\pgf@subpic@minx@children=\dimen167
+\pgf@subpic@miny@children=\dimen168
+\pgf@subpic@maxx@children=\dimen169
+\pgf@subpic@maxy@children=\dimen170
+\pgf@subpic@hbox@child=\box37
+\pgf@subpic@minx@child=\dimen171
+\pgf@subpic@miny@child=\dimen172
+\pgf@subpic@maxx@child=\dimen173
+\pgf@subpic@maxy@child=\dimen174
+\pgftree@lastchildx=\dimen175
+\pgftree@lastchildy=\dimen176
+))
+(/usr/share/texmf/tex/latex/tikz-qtree/tikz-qtree.tex
+\@result=\toks31
+\child@list=\toks32
+\root@node=\toks33
+))
 (/usr/share/texmf/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibraryarrow
 s.code.tex
 File: tikzlibraryarrows.code.tex 2008/01/09 v2.00 (rcs-revision 1.1)
@@ -357,155 +392,158 @@ File: pgflibraryarrows.code.tex 2007/06/07 v2.00 (rcs-revision 1.7)
 (/usr/share/texmf/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibraryautom
 ata.code.tex
 File: tikzlibraryautomata.code.tex 2008/02/14 v2.00 (rcs-revision 1.2)
+)
+(/usr/share/texmf/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibraryshape
+s.code.tex
+File: tikzlibraryshapes.code.tex 2008/01/09 v2.00 (rcs-revision 1.1)
+
+(/usr/share/texmf/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibraryshape
+s.geometric.code.tex
+File: tikzlibraryshapes.geometric.code.tex 2008/01/09 v2.00 (rcs-revision 1.1)
+
+(/usr/share/texmf/tex/generic/pgf/libraries/pgflibraryshapes.geometric.code.tex
+File: pgflibraryshapes.geometric.code.tex 2008/02/01 v2.00 (rcs-revision 1.22)
+))
+(/usr/share/texmf/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibraryshape
+s.misc.code.tex
+File: tikzlibraryshapes.misc.code.tex 2008/01/09 v2.00 (rcs-revision 1.1)
+
+(/usr/share/texmf/tex/generic/pgf/libraries/pgflibraryshapes.misc.code.tex
+File: pgflibraryshapes.misc.code.tex 2008/02/12 v2.00 (rcs-revision 1.10)
+))
+(/usr/share/texmf/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibraryshape
+s.symbols.code.tex
+File: tikzlibraryshapes.symbols.code.tex 2008/01/09 v2.00 (rcs-revision 1.1)
+
+(/usr/share/texmf/tex/generic/pgf/libraries/pgflibraryshapes.symbols.code.tex
+File: pgflibraryshapes.symbols.code.tex 2008/01/30 v2.00 (rcs-revision 1.13)
+))
+(/usr/share/texmf/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibraryshape
+s.arrows.code.tex
+File: tikzlibraryshapes.arrows.code.tex 2008/01/09 v2.00 (rcs-revision 1.1)
+
+(/usr/share/texmf/tex/generic/pgf/libraries/pgflibraryshapes.arrows.code.tex
+File: pgflibraryshapes.arrows.code.tex 2007/11/10 v2.00 (rcs-revision 1.3)
+))
+(/usr/share/texmf/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibraryshape
+s.callouts.code.tex
+(/usr/share/texmf/tex/generic/pgf/libraries/pgflibraryshapes.callouts.code.tex)
+)
+(/usr/share/texmf/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibraryshape
+s.multipart.code.tex
+File: tikzlibraryshapes.multipart.code.tex 2008/01/09 v2.00 (rcs-revision 1.1)
+
+(/usr/share/texmf/tex/generic/pgf/libraries/pgflibraryshapes.multipart.code.tex
+File: pgflibraryshapes.multipart.code.tex 2008/01/15 v2.00 (rcs-revision 1.7)
+\pgfnodepartlowerbox=\box38
+\pgfnodepartsecondbox=\box39
+\pgfnodepartthirdbox=\box40
+\pgfnodepartfourthbox=\box41
+)))
+(/usr/share/texmf/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibraryposit
+ioning.code.tex
+File: tikzlibrarypositioning.code.tex 2008/02/12 v2.00 (rcs-revision 1.5)
 ) (./finalproj_6830.aux)
 \openout1 = `finalproj_6830.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 30.
-LaTeX Font Info:    ... okay on input line 30.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 30.
-LaTeX Font Info:    ... okay on input line 30.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 30.
-LaTeX Font Info:    ... okay on input line 30.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 30.
-LaTeX Font Info:    ... okay on input line 30.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 30.
-LaTeX Font Info:    ... okay on input line 30.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 30.
-LaTeX Font Info:    ... okay on input line 30.
-LaTeX Font Info:    Try loading font information for OT1+ppl on input line 30.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Try loading font information for OT1+ppl on input line 34.
 
 (/usr/share/texmf-texlive/tex/latex/psnfss/ot1ppl.fd
 File: ot1ppl.fd 2001/06/04 font definitions for OT1/ppl.
 )
 (/usr/share/texmf-texlive/tex/context/base/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count120
-\scratchdimen=\dimen157
-\scratchbox=\box36
-\nofMPsegments=\count121
-\nofMParguments=\count122
-\everyMPshowfont=\toks31
-\MPscratchCnt=\count123
-\MPscratchDim=\dimen158
-\MPnumerator=\count124
-\everyMPtoPDFconversion=\toks32
+\scratchcounter=\count122
+\scratchdimen=\dimen177
+\scratchbox=\box42
+\nofMPsegments=\count123
+\nofMParguments=\count124
+\everyMPshowfont=\toks34
+\MPscratchCnt=\count125
+\MPscratchDim=\dimen178
+\MPnumerator=\count126
+\everyMPtoPDFconversion=\toks35
 )
-LaTeX Font Info:    Try loading font information for U+msa on input line 32.
+LaTeX Font Info:    Try loading font information for U+msa on input line 37.
  (/usr/share/texmf-texlive/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2009/06/22 v3.00 AMS symbols A
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 32.
+LaTeX Font Info:    Try loading font information for U+msb on input line 37.
 
 (/usr/share/texmf-texlive/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2009/06/22 v3.00 AMS symbols B
 )
 LaTeX Font Info:    Font shape `OT1/ppl/bx/n' in size <10> not available
-(Font)              Font shape `OT1/ppl/b/n' tried instead on input line 34.
+(Font)              Font shape `OT1/ppl/b/n' tried instead on input line 39.
 
-Underfull \hbox (badness 10000) in paragraph at lines 35--36
+Underfull \hbox (badness 10000) in paragraph at lines 40--41
 
  []
 
 LaTeX Font Info:    Font shape `OT1/ppl/bx/n' in size <14.4> not available
-(Font)              Font shape `OT1/ppl/b/n' tried instead on input line 40.
+(Font)              Font shape `OT1/ppl/b/n' tried instead on input line 45.
 (./intro.tex
 LaTeX Font Info:    Font shape `OT1/ppl/bx/n' in size <10.95> not available
 (Font)              Font shape `OT1/ppl/b/n' tried instead on input line 1.
-
-
-LaTeX Warning: Citation `stonebraker9requirements' on page 1 undefined on input
- line 15.
-
 LaTeX Font Info:    Try loading font information for OMS+ppl on input line 18.
-(/usr/share/texmf-texlive/tex/latex/psnfss/omsppl.fd
+ (/usr/share/texmf-texlive/tex/latex/psnfss/omsppl.fd
 File: omsppl.fd 
 )
 LaTeX Font Info:    Font shape `OMS/ppl/m/n' in size <10.95> not available
 (Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 18.
  [1
 
-{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]
-
-LaTeX Warning: Citation `cudr√©2009demonstration' on page 2 undefined on input 
-line 23.
-
-) (./background.tex
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]) (./background.tex
 
 LaTeX Warning: Reference `diag' on page 2 undefined on input line 41.
 
 LaTeX Font Info:    Try loading font information for OT1+pcr on input line 49.
 (/usr/share/texmf-texlive/tex/latex/psnfss/ot1pcr.fd
 File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
-)) [2] (./related.tex
-
-LaTeX Warning: Citation `buneman00' on page 3 undefined on input line 3.
-
-
-LaTeX Warning: Citation `simmhan05asurvey' on page 3 undefined on input line 5.
-
-
-
-LaTeX Warning: Citation `simmhan_survey' on page 3 undefined on input line 7.
-
-
-LaTeX Warning: Citation `glavic_dataprovenance' on page 3 undefined on input li
-ne 9.
-
-
-LaTeX Warning: Citation `queryprov_sig2010' on page 3 undefined on input line 1
-1.
-
-
-LaTeX Warning: Citation `chapman_provstorage' on page 3 undefined on input line
- 13.
-
-
-LaTeX Warning: Citation `plt_stanford' on page 3 undefined on input line 15.
-
-
-LaTeX Warning: Citation `widom2005trio' on page 3 undefined on input line 18.
-
-
-LaTeX Warning: Citation `sarma2010live' on page 3 undefined on input line 18.
-
-
-LaTeX Warning: Citation `ikeda2010panda' on page 3 undefined on input line 22.
-
-
-LaTeX Warning: Citation `cudr√©2009demonstration' on page 3 undefined on input 
-line 26.
-
-) (./arch.tex) (./track.tex
+)) [2] (./related.tex)
+(./arch.tex) (./track.tex
 LaTeX Font Info:    Font shape `OT1/ppl/bx/n' in size <12> not available
-(Font)              Font shape `OT1/ppl/b/n' tried instead on input line 4.
-) [3] (./conclusion.tex) (./finalproj_6830.bbl
+(Font)              Font shape `OT1/ppl/b/n' tried instead on input line 5.
+ [3] [4]
+
+LaTeX Warning: Reference `disc' on page 5 undefined on input line 48.
+
+) [5] (./conclusion.tex) (./finalproj_6830.bbl
 Missing character: There is no ‚ in font pplr7t!
 Missing character: There is no à in font pplr7t!
 Missing character: There is no ó in font pplr7t!
 Missing character: There is no ‚ in font pplri7t!
 Missing character: There is no Ä in font pplri7t!
 Missing character: There is no ô in font pplri7t!
-
-[4]
+ [6]
 Missing character: There is no ‚ in font pplri7t!
 Missing character: There is no Ä in font pplri7t!
 Missing character: There is no ô in font pplri7t!
-) [5] (./finalproj_6830.aux)
+) [7] (./finalproj_6830.aux)
 
 LaTeX Warning: There were undefined references.
 
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
  ) 
 Here is how much of TeX's memory you used:
- 8578 strings out of 495061
- 147613 string characters out of 1182620
- 197103 words of memory out of 3000000
- 11543 multiletter control sequences out of 15000+50000
- 21336 words of font info for 61 fonts, out of 3000000 for 9000
+ 10290 strings out of 495061
+ 190556 string characters out of 1182620
+ 262657 words of memory out of 3000000
+ 13187 multiletter control sequences out of 15000+50000
+ 27347 words of font info for 78 fonts, out of 3000000 for 9000
  28 hyphenation exceptions out of 8191
- 47i,6n,49p,925b,211s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 47i,13n,60p,925b,805s stack positions out of 5000i,500n,10000p,200000b,50000s
 {/usr/share/texmf-texlive/fonts/enc/dvips/base/8r.enc}</usr/share/texmf-texli
 ve/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texmf-texlive/fonts/ty
 pe1/public/amsfonts/cm/cmr10.pfb></usr/share/texmf-texlive/fonts/type1/public/a
@@ -513,9 +551,9 @@ msfonts/cm/cmsy10.pfb></usr/share/texmf-texlive/fonts/type1/urw/courier/ucrr8a.
 pfb></usr/share/texmf-texlive/fonts/type1/urw/palatino/uplb8a.pfb></usr/share/t
 exmf-texlive/fonts/type1/urw/palatino/uplr8a.pfb></usr/share/texmf-texlive/font
 s/type1/urw/palatino/uplri8a.pfb>
-Output written on finalproj_6830.pdf (5 pages, 114019 bytes).
+Output written on finalproj_6830.pdf (7 pages, 123566 bytes).
 PDF statistics:
- 50 PDF objects out of 1000 (max. 8388607)
+ 58 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  13 words of extra memory for PDF output out of 10000 (max. 10000000)
 

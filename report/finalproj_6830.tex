@@ -4,10 +4,14 @@
 \usepackage{graphicx}    % needed for including graphics e.g. EPS, PS
 \usepackage{palatino}
 \usepackage{tikz}
+\usepackage{tikz-qtree}
 
 \usetikzlibrary{arrows}
 \usetikzlibrary{automata}
+\usetikzlibrary{shapes}
+\usetikzlibrary{positioning}
 %\usetikzlibrary{positioning}
+
 
 \topmargin -1.5cm        % read Lamport p.163
 \oddsidemargin -0.04cm   % read Lamport p.163
@@ -29,6 +33,7 @@
 %\date{}
 \begin{document}
 
+\tikzstyle{abstract}=[rectangle, draw=black, anchor=north, text centered]
 \maketitle
 
 \begin{abstract}
@@ -54,6 +59,8 @@ In this work, we modify the internals of PostgreSQL, a popular open source datab
 \section{Tracking Provenance inside PostgreSQL}
 
 \input{track}
+
+
 \section{Visualizing Forward and Backward Provenance}
 
 couple of screenshots, and one showing the graph.
