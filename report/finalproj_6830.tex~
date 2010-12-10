@@ -25,9 +25,10 @@
 % \addtolength{\textheight}{1in}
 % \addtolength{\voffset}{-1in}
 
-\title{Tracking and Visualizing Provenance using PostgreSQL}
+\title{\textbf{Tracking and Visualizing Provenance using PostgreSQL}\\
+6.830 project : Final report}
 \author{Alexander Rush (srush@mit.edu)\\ Nirmesh Malviya (nirmesh@mit.edu)}
-%\date{}
+
 \begin{document}
 
 \maketitle

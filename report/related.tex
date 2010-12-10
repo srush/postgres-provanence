@@ -1,55 +1,11 @@
 % detail each work briefly. There is nothing to dismiss really.
 
+One of the earliest works in capturing data lineage was by Lanter~\cite{lanter_1991}, who designed a \textit{lineage information program} containing a lineage meta database for GIS databases. His work used a knowledge representation graph with nodes and edges having domain specific semantic meanings. The network could be partitioned into source, intermediate and product layers depending on the parent-child relationship between different nodes. An early work by Cui et al~\cite{lineage_stanford} studied provenance of materialized views in data warehouse settings. Their lineage tracing algorithm essentially transforms and ASPJ (aggregate-select-project-join) view into an equivalent canonical ASPJ view which helps trace lineage for the original view. They also examine use of auxiliary views for efficiently tracking lineage.
 
-In particular, we hope to respond to the challenge given by \cite{cudré2009demonstration}.
+The \textit{TRIO} system~\cite{widom2005trio} considers a closed world system where no external sources contribute to new elements in a database. Provenance in this system is eager, and recorded at tuple granularity. Lineage information essentially connects each data element to data elements from which it was derived, so that backward provenance can be easily queried (derived tuples are connected to previous tuples they originate form). Our implementation of provenance in this project uses a similar approach to keep track of provenance data inside Postgres.
 
-\begin{quote}
-Recording the log is easy. The hard part is to create a provenance query language and an efficient implementation.  
-\end{quote}
+A recent versioned database called LIVE~\cite{sarma2010live} is based on Trio and allows for query processing over derived and versioned data tables by combining versioning and data lineage. This system also provides constructs extending SQL to allow for queries over different versions of a database (eg \texttt{SELECT * FROM $<$table-name$>$ VALID AT $<$revision-number$>$} returns the rows from a table at a specific revision number). Just as for Trio, the LIVE database stores a back pointer for each derived data element. In our example in Section~\ref{background}, it would store $(s1, s2)$, $(s1, s3)$, and $(s3, s4)$ explicitly. Thus the system can perform very efficient backwards queries by walking along this tree at run time. The lineage tracking however has a significant space overhead unavoidable due to storing extra meta-data per tuple.The recent \textit{Panda} project is an early stage proposal by for a general provenance system for data. At the time of this writing, the system does not propose a practical algorithm or language features for its general provenance system~\cite{ikeda2010panda}.
 
-Recent work in this area includes the Trio/LIVE system and the Panda project. However, neither of these projects handle backward provenance efficiently or provide language support for querying provenance.
-This lack of historical record can make database systems impractical for scientific research. 
+Concerned with the amount of storage required to track provenance, Chapman et al~\cite{chapman_provstorage} developed the idea of \text{provenance factorization} which identifies properties of provenance to reduce storage costs by significant factors. Their algorithms use predicate and structural inheritance to factorize nodes. Post factorization, provenance records are maintained in a separate provenance store. The SciDB system~\cite{cudré2009demonstration} contrasts with existing eager approaches and instead proposes a lazy provenance system. For forward queries, the idea is to use the SciDB's version control system and follow forward deltas~\cite{oo_versioning}. They note that backward provenance would not be very efficient using this strategy unless an parallely constructed inverted version tree capturing backward delta also exists. In the absence of a version control system, low space complexity but non-trivial query time idea is to implement an algorithm which can do backward and forward propagation using the system's query log and some metadata about operators and their inversions.
 
-One practical issue with available database systems is the difficulty of tracing data history. 
-
-~\cite{buneman00}
-
-\cite{simmhan05asurvey} 
-
-\cite{simmhan_survey} 
-
-\cite{glavic_dataprovenance}
-
-\cite{queryprov_sig2010}
-
-\cite{chapman_provstorage, buneman00, simmhan05asurvey}
-
-\cite{plt_stanford}
-
-\begin{itemize}
-%\item Trio / LIVE \cite{} 
-  
-\item Implements a technique for backward provenance by connecting derived tuples to the previous tuples. Unfortunately, this technique has very high space complexity and may not scale in practice. 
-
-\item Panda \cite{ikeda2010panda} 
-
-Panda is an early stage proposal for a general provenance system for data. This system does not propose a practical algorithm or language features for provenance. 
-
-\item SciDB \cite{cudré2009demonstration}
-
-The SciDB system proposes a provenance system. Current proposals have low space complexity but with non-trivial query time. 
-
-\end{itemize}
-
-
-In the LIVE provenance system built as part of the Trio project, the database stores a back pointer for each derived data element. In our example, it would store $(s1, s2)$, $(s1, s3)$, and $(s3, s4)$ explicitly. It can then perform very efficient backwards queries by walking along this tree. Unfortunately, this technique requires storing a derivation pair for each derived and its parents, which can be very expensive.  
-
-The SciDB proposal suggests a different way to implement provenance. For forward queries, the propose using the databases version control system and following forward deltas. They note that backward provenance is more difficult to implement. Two possible methods they mention are to also include backward deltas as part of version control or to implement an algorithm which can reverse the queries from the log. 
-
-The other open quesion surrounding provenance is how to include provenance queries within SQL. There have been relatively few proposed solutions for this problem. The LIVE system implements a keyword ``valid at'' which queries a data element at a specific revision. For instance the query:
-
-\begin{verbatim}
-SELECT * FROM <table-name> VALID AT <revision-number>
-\end{verbatim}
-
-This query returns the rows from a table at a specific revision number. This syntax allows a query to access a revision, but does not allow us to specify a provenance query the directly. 
+A recent paper on querying semiring provenance~\cite{queryprov_sig2010} proposed a data provenance query language ProQL, a graph query language which they translate to SQL queries which run over relational provenance stores. They use a compact-graph provenance storage which is queried by ProQL. Their queries can additionally be used to compute data annotations and detect side effects of database updates.
