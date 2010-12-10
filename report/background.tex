@@ -1,40 +1,40 @@
 % add background on what provenance is 
 % add a diagram
 
-% \begin{figure}
-%   \centering
-%   \label{diag}
-%   \begin{tikzpicture}
-%     \node (s1) [draw]{s1};
-% 
-%     \node (s2) [draw,above right= of s1]{s2};
-%     \node (s3) [draw,below right= of s1]{s3};
-%     \node (s4) [draw, right= of s3]{s4};
-%     \path [->] (s1) edge[thick] (s2);    
-%     \path [->] (s1) edge[thick] (s3);    
-%     \path [->] (s3) edge[thick] (s4);    
-% 
-%     \path [->] (s4) edge[thick, bend right = 50, dotted] (s3);    
-%     \path [->] (s3) edge[thick, bend right = 50, dotted] (s1);    
-%   \end{tikzpicture}
-%   \begin{tikzpicture}
-%     \node (s1) [draw]{s1};
-% 
-%     \node (s2) [draw,above right= of s1]{s2};
-%     \node (s3) [draw,below right= of s1]{s3};
-%     \node (s4) [draw, right= of s3]{s4};
-%     \path [->] (s1) edge[thick] (s2);    
-%     \path [->] (s1) edge[thick] (s3);    
-%     \path [->] (s3) edge[thick] (s4);    
-% 
-%     \path [<-] (s4) edge[thick, bend right = 50, dotted] (s3);    
-%     \path [<-] (s3) edge[thick, bend right = 50, dotted] (s1);    
-%     \path [<-] (s2) edge[thick, bend right = 50, dotted] (s1);    
-%   \end{tikzpicture}
-% 
-%   \caption{(a) Backward provenance (b) Forward provenance}
-% 
-% \end{figure}
+\begin{figure}
+  \centering
+  \label{diag}
+  \begin{tikzpicture}
+    \node (s1) [draw]{s1};
+
+    \node (s2) [draw,above right= of s1]{s2};
+    \node (s3) [draw,below right= of s1]{s3};
+    \node (s4) [draw, right= of s3]{s4};
+    \path [->] (s1) edge[thick] (s2);    
+    \path [->] (s1) edge[thick] (s3);    
+    \path [->] (s3) edge[thick] (s4);    
+
+    \path [->] (s4) edge[thick, bend right = 50, dotted] (s3);    
+    \path [->] (s3) edge[thick, bend right = 50, dotted] (s1);    
+  \end{tikzpicture}
+  \begin{tikzpicture}
+    \node (s1) [draw]{s1};
+
+    \node (s2) [draw,above right= of s1]{s2};
+    \node (s3) [draw,below right= of s1]{s3};
+    \node (s4) [draw, right= of s3]{s4};
+    \path [->] (s1) edge[thick] (s2);    
+    \path [->] (s1) edge[thick] (s3);    
+    \path [->] (s3) edge[thick] (s4);    
+
+    \path [<-] (s4) edge[thick, bend right = 50, dotted] (s3);    
+    \path [<-] (s3) edge[thick, bend right = 50, dotted] (s1);    
+    \path [<-] (s2) edge[thick, bend right = 50, dotted] (s1);    
+  \end{tikzpicture}
+
+  \caption{(a) Backward provenance (b) Forward provenance}
+
+\end{figure}
 
 The term \textit{provenance} or \textit{lineage} of data broadly refers to what source a data item came from, what transformations were applied on the original data to arrive at the current data item, how the current data item has been updated over time and what other data items might have been derived from the current data item. Broadly speaking, provenance information belongs to one of two categories: \textit{source provenance} (why-provenance) and \textit{transformation provenance}~\cite{tan_ieee04} (or how-provenance). Source provenance refers to source data from which a data element was derived, whereas transformation provenance is concerned with the different processes or operations that were used to arrive at the data element starting from the source data. Transformation provenance is also occassionally referred to as \textit{semiring} provenance~\cite{semiring_pods07} based on the alegbraic structure semiring. A slightly different characterization~\cite{ikeda2010panda} classifies provenance as mostly either \text{data-based}, in which well defined data models are used to track fine-grained provenance of data elements, or \text{process-based}, where the processes generating a data element along with coarse-grained provenance is captured. 
 
