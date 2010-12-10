@@ -1,5 +1,4 @@
-
-
+\begin{figure}
 \begin{tikzpicture}[node distance=1cm, font=\Large]
   \tikzstyle{box}=[drop shadow, rectangle, fill=yellow!40, rounded corners, draw=black, anchor=north, text centered, text width=5cm]
   \tikzstyle{pbox}=[drop shadow, fill=blue!20, draw=black, anchor=north, text centered, minimum height=3.0cm, minimum width=4.0cm]
@@ -17,3 +16,10 @@
   \draw[-, ultra thick] (prov) --(post);
   \draw[-, ultra thick] (data) --(post);
 \end{tikzpicture}
+\label{fig:provarch}
+\caption{The architecture of our provenance system}
+\end{figure}
+
+Figure~\ref{fig:provarch} shows the architecture of our provenance implementation. Provenance tables are populated as the PostgreSQL backend executes queries which add new tuples to the database. Each database has its own dedicated provenance store which tracks provenance for all tables inside the database. The eagerly captured provenance information can be queried via both command line and graphical interfaces. Querying forward and backward provenance via command line requires jointly querying against the provenance and data tables using the table name and id of the data tuple under consideration. 
+
+The graphical interface is a web-frontend which queries the provenance tables for forward and backward provenance in the background as the user interactively clicks on data elements of interest. Different tables and data elements can be directly specified using their names/ids using drop-down HTML forms.
