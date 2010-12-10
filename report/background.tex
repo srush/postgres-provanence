@@ -50,6 +50,8 @@ Thus we can have two types of provenance queries, \textit{forward} and \textit{b
 
 Fig~\ref{diag} shows examples of these two queries. We assume that our original data is $s1$, it leads to $s2$ and $s3$. In turn, $s4$ is derived from $ s3$. Our forward query from $ s1$ leads to each of the other data elements, while the backward query from  $s4$ leads back to the root. 
 
-Provenance can either be computed and stored eagerly by capturing forward and backward data pointers (for example~\cite{widom2005trio}) or lazily by just recording the query log along with a knowledge of inversion operations~\cite{stonebraker9requirements}. 
+Provenance can either be computed and stored eagerly by capturing forward and backward data pointers (for example~\cite{widom2005trio}) or lazily by just recording the query log along with a knowledge of inversion operations~\cite{stonebraker9requirements}. The two strategies have vastly different storage requirements and query efficiency. We discuss some work on this in Section~\ref{related}.
 
-A more detailed survey of data provenance approaches, including a discussion of conceptual properties of provenance models and different storage and recording strategies can be found in \cite{glavic_dataprovenance}. The two strategies have vastly different storage requirements and query efficiency. We discuss some work on this in Section~\ref{related}.
+A more detailed survey of data provenance approaches, including a discussion of conceptual properties of provenance models and different storage and recording strategies can be found in \cite{glavic_dataprovenance}. 
+
+For our implementation, we exclusively focus on eager source data provenance. 
