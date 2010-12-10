@@ -1,35 +1,19 @@
-\textbf{XXX}: outlines added for all sections, need to fill in details everywhere
 % motivate provenance and briefly overview it
 
 A large number of applications such as scientific data management, data integration, information extraction and business analytics involve processing base data to generate a large amount of new data derived from the base data. Capturing which data items contributed to creation of a new data item is important in the face of issues like questionable quality of base data, potential uncertainty associated with it, as well as the authority and trust assessment of the user performing the operations. We see that if data history is not traced in any form as the operations are performed, it would be impossible to track what future tables potential errors in early stage data collection may have propagated to. Tracking down errors and updating all tuples derived from an erroneous data item can be prohibitively costly or even impossible in the absence of this historical information.
 
 % definition of provenance and brief overview
-The term \textit{provenance} refers 
-The problem of storing and quering previous data history is known as \emph{provenance}. Recent work in this area includes the Trio/LIVE system and the Panda project. However, neither of these projects handle backward provenance efficiently or provide language support for querying provenance.
+This metadata capturing historical information about a data item is referred to as the \textit{provenance} of the item. The type and amount of provenance information required for different applications vary widely, and depending on the information stored, provenance can be used to derive probabilities associated with a derived data item using uncertainty information about data items that produced it~\cite{widom2005trio}, for debugging schema mappings~\cite{schema_vldb07}, learning authority of data sources~\cite{schema_vldb07}, using user feedback for adjusting ordering in ranking systems ~\cite{integration_vldb08} and many others~\cite{simmhan05asurvey}. Source provenance, a subset of the different types of historical information about a data item, only pertains to what data sources an item was derived from (we can also have transformation provenance, see Section~\ref{background} for a discussion).
 
 % talk about lack of support in databases and current work
-This lack of historical record can make database systems impractical for scientific research. 
+Traditionally, attempts to track provenance of data were confined to data processing stages outside of the data management system. With increased availability of cheap storage in recent years and data explosion online (and otherwise), the problem of capturing, storing and querying provenance has been extensively studied~\cite{glavic_dataprovenance, ikeda2010panda, dataspace_halevy}. A number of provenance management solutions have been proposed or developed from the ground up in recent years~\cite{sarma2010live, stonebraker9requirements, widom2005trio, lineage_stanford, chimera_2002, preserv_prov, dbnotes_sig05}. However, to the best of the our knowledge, till date none of the widely used commercial database systems offer even basic support for tracking provenance of all queries executed against the database system. 
 
-One practical issue with available database systems is the difficulty of tracing data history. 
+In this project, we have added support for tracking source provenance inside a popular open source database system PostgreSQL~\cite{postgres} for a subset of SQL. Our goal is not to compete with existing ground up provenance solutions in terms of efficiency of storing or querying provenance but rather to implement a basic provenance system in a widely used existing large scale system.
 
-Our goal is to improve upon existing provenance systems, focusing on the SciDB project. The SciDB proposal \cite{stonebraker9requirements} lists three requirements for a useful provenance system -
-
+In summary, our contributions in this project are:
 \begin{itemize}
-\item For any data element, we would like to recover the derivation history. 
-\item If a data element is updated, we would like to trace forward to see other effected elements.
-\item At any point, we would like to reproduce the construction of the current data. 
+ \item We implement a basic source provenance system in PostgreSQL, which eagerly captures provenance of newly created data items, allowing for the ability to track provenance using Postgres.
+\item We develop an interactive web interface to query forward and backward data provenance on existing tables.
 \end{itemize}
 
-In particular, we hope to respond to the challenge given by \cite{cudré2009demonstration}.
-
-\begin{quote}
-Recording the log is easy. The hard part is to create a provenance query language and an efficient implementation.  
-\end{quote}
-
-Contributions:
-
-Implemented the ability to track provenance inside postgresql
-
-Implemented a visualizer that makes querying forward and backward provenance easier.
-
-don't support stored procedures , they are black boxes, and unless something useful is known about the underlying functions, we anyway do not get to know too much about them.
+The rest of this paper is organized as follows. We explain provenance in Section~\ref{background} and briefly discuss the state of the art in this area in Section~\ref{related}. We describe our implementation in Section~\ref{implement} and show our query interface in Section~\ref{visualizer}. We finally conclude in Section~\ref{conclude}.

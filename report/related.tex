@@ -1,5 +1,17 @@
 % detail each work briefly. There is nothing to dismiss really.
 
+
+In particular, we hope to respond to the challenge given by \cite{cudré2009demonstration}.
+
+\begin{quote}
+Recording the log is easy. The hard part is to create a provenance query language and an efficient implementation.  
+\end{quote}
+
+Recent work in this area includes the Trio/LIVE system and the Panda project. However, neither of these projects handle backward provenance efficiently or provide language support for querying provenance.
+This lack of historical record can make database systems impractical for scientific research. 
+
+One practical issue with available database systems is the difficulty of tracing data history. 
+
 ~\cite{buneman00}
 
 \cite{simmhan05asurvey} 
@@ -10,14 +22,14 @@
 
 \cite{queryprov_sig2010}
 
-\cite{chapman_provstorage}
+\cite{chapman_provstorage, buneman00, simmhan05asurvey}
 
 \cite{plt_stanford}
 
 \begin{itemize}
-\item Trio / LIVE \cite{widom2005trio, sarma2010live} 
+%\item Trio / LIVE \cite{} 
   
-Implements a technique for backward provenance by connecting derived tuples to the previous tuples. Unfortunately, this technique has very high space complexity and may not scale in practice. 
+\item Implements a technique for backward provenance by connecting derived tuples to the previous tuples. Unfortunately, this technique has very high space complexity and may not scale in practice. 
 
 \item Panda \cite{ikeda2010panda} 
 
@@ -28,3 +40,16 @@ Panda is an early stage proposal for a general provenance system for data. This 
 The SciDB system proposes a provenance system. Current proposals have low space complexity but with non-trivial query time. 
 
 \end{itemize}
+
+
+In the LIVE provenance system built as part of the Trio project, the database stores a back pointer for each derived data element. In our example, it would store $(s1, s2)$, $(s1, s3)$, and $(s3, s4)$ explicitly. It can then perform very efficient backwards queries by walking along this tree. Unfortunately, this technique requires storing a derivation pair for each derived and its parents, which can be very expensive.  
+
+The SciDB proposal suggests a different way to implement provenance. For forward queries, the propose using the databases version control system and following forward deltas. They note that backward provenance is more difficult to implement. Two possible methods they mention are to also include backward deltas as part of version control or to implement an algorithm which can reverse the queries from the log. 
+
+The other open quesion surrounding provenance is how to include provenance queries within SQL. There have been relatively few proposed solutions for this problem. The LIVE system implements a keyword ``valid at'' which queries a data element at a specific revision. For instance the query:
+
+\begin{verbatim}
+SELECT * FROM <table-name> VALID AT <revision-number>
+\end{verbatim}
+
+This query returns the rows from a table at a specific revision number. This syntax allows a query to access a revision, but does not allow us to specify a provenance query the directly. 
