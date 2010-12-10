@@ -4,11 +4,18 @@
 \usepackage{graphicx}    % needed for including graphics e.g. EPS, PS
 \usepackage{palatino}
 \usepackage{tikz}
+\usepackage{tikz-qtree}
+
 \usepackage{url, hyperref}
+
 
 \usetikzlibrary{arrows}
 \usetikzlibrary{automata}
+\usetikzlibrary{shapes}
+\usetikzlibrary{positioning}
+\usetikzlibrary{shadows}
 %\usetikzlibrary{positioning}
+
 
 \topmargin -1.5cm        % read Lamport p.163
 \oddsidemargin -0.04cm   % read Lamport p.163
@@ -26,11 +33,12 @@
 % \addtolength{\voffset}{-1in}
 
 \title{\textbf{Tracking and Visualizing Provenance using PostgreSQL}\\
-6.830 project : Final report}
+\textsc{6.830 Project : Final Report}}
 \author{Alexander Rush (srush@mit.edu)\\ Nirmesh Malviya (nirmesh@mit.edu)}
 
 \begin{document}
 
+\tikzstyle{abstract}=[rectangle, draw=black, anchor=north, text centered]
 \maketitle
 
 \begin{abstract}
@@ -56,9 +64,10 @@ In this work, we modify the internals of PostgreSQL, a popular open source datab
 \section{Tracking Provenance inside PostgreSQL} \label{implement}
 
 \input{track}
+
 \section{Visualizing Forward and Backward Provenance} \label{visualizer}
 
-couple of screenshots, and one showing the graph.
+\input{visual}
 
 don't support stored procedures , they are black boxes, and unless something useful is known about the underlying functions, we anyway do not get to know too much about them.
 
