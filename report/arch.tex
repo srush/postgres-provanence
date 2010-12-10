@@ -1,1 +1,19 @@
-Figure of system architecture -- provenance storage and querying.
+
+
+\begin{tikzpicture}[node distance=1cm, font=\Large]
+  \tikzstyle{box}=[drop shadow, rectangle, fill=yellow!40, rounded corners, draw=black, anchor=north, text centered, text width=5cm]
+  \tikzstyle{pbox}=[drop shadow, fill=blue!20, draw=black, anchor=north, text centered, minimum height=3.0cm, minimum width=4.0cm]
+  \tikzstyle{sbox}=[drop shadow, rectangle, fill=blue!20, draw=black, anchor=north, text centered, text width=3cm]
+  \node (post) [pbox,cylinder, shape border rotate=90, aspect=0.25, ]{\textbf{Postgres}};   
+  \node (data) [sbox, rectangle, below left=of post, text centered ]{Data\\  Tables};   
+  \node (prov) [sbox, below right=of post, text centered]{Provenance\\ Tables };   
+
+
+  \node (client) [box, above=of post ]{Command-line Client};           
+  \node (vis) [box, right=of client]{Visualizer};           
+
+  \draw[<->, ultra thick] (vis) --(post);
+  \draw[<->, ultra thick] (client) --(post);
+  \draw[-, ultra thick] (prov) --(post);
+  \draw[-, ultra thick] (data) --(post);
+\end{tikzpicture}
