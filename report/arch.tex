@@ -16,10 +16,11 @@
   \draw[-, ultra thick] (prov) --(post);
   \draw[-, ultra thick] (data) --(post);
 \end{tikzpicture}
-\label{fig:provarch}
+
 \caption{The architecture of our provenance system}
+\label{fig:provarch}
 \end{figure}
 
-Figure~\ref{fig:provarch} shows the architecture of our provenance implementation. Provenance tables are populated as the PostgreSQL backend executes queries which add new tuples to the database. Each database has its own dedicated provenance store which tracks provenance for all tables inside the database. The eagerly captured provenance information can be queried via both command line and graphical interfaces. Querying forward and backward provenance via command line requires jointly querying against the provenance and data tables using the table name and id of the data tuple under consideration. 
+Figure~\ref{fig:provarch} shows the architecture of our provenance system. Provenance tables are populated as the PostgreSQL backend executes queries which add new tuples to the database. Each database has its own dedicated provenance store which tracks provenance for all tables inside the database. The eagerly captured provenance information can be queried via both command line and graphical interfaces. Querying forward and backward provenance via command line requires jointly querying against the provenance and data tables using the table name and id of the data tuple under consideration. 
 
-The graphical interface is a web-frontend which queries the provenance tables for forward and backward provenance in the background as the user interactively clicks on data elements of interest. Different tables and data elements can be directly specified using their names/ids using drop-down HTML forms.
+The graphical interface is a web-frontend which queries the provenance tables for forward and backward provenance in the background as the user interactively clicks on data elements of interest. Different tables and data elements can be directly specified using their names/ids using drop-down HTML forms (see Section~\ref{visualizer} for details). 
